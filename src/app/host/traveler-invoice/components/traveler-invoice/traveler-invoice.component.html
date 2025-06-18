@@ -1,0 +1,135 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">New Guest Pay</h3>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="form" (submit)="onSave()">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group mt-0">
+                    <label class="mb-0">Facility</label>
+                    <mat-form-field>
+                      <mat-select formControlName="facilityId">
+                        <mat-option *ngFor="let facility of facilities" [value]="facility.id">
+                          {{ facility.name }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group mt-0">
+                    <label class="mb-0">Vehicle</label>
+                    <mat-form-field>
+                      <mat-select formControlName="parkingPassSubscriptionId">
+                        <mat-option *ngFor="let permit of permits" [value]="permit.id">
+                          {{ permit.vehicle.name }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group mt-0">
+                    <label class="mb-0">Reservation ID</label>
+                    <mat-form-field>
+                      <input formControlName="reservationId" matInput type="text" />
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <mat-checkbox class="mr-2" formControlName="requireLicensePlate">Require License
+                Plate</mat-checkbox>
+              <mat-checkbox class="mr-2" formControlName="requireLastName">Require Last
+                Name</mat-checkbox>
+
+              <h5 class="mt-4">Notification</h5>
+              <div class="row">
+                <div class="col-12">
+                  <mat-radio-group formControlName="sendEmail">
+                    <div class="row align-items-center">
+                      <div class="col-md-auto">
+                        <mat-radio-button class="mb-2" [value]="true">PMCS Email Client</mat-radio-button>
+                      </div>
+                      <div *ngIf="form.value.sendEmail" class="col-md-4">
+                        <mat-form-field appearance="fill">
+                          <input formControlName="customerEmail" matInput type="text" placeholder="Customer Email" />
+                        </mat-form-field>
+                      </div>
+                      <div class="col-md-auto">
+                        <mat-radio-button class="mb-2" [value]="false">Invoice Link Only</mat-radio-button>
+                      </div>
+                    </div>
+                  </mat-radio-group>
+                </div>
+                <div class="col-12">
+                  <div class="form-group mt-0">
+                    <label class="mb-0">Message</label>
+                    <mat-form-field>
+                      <textarea formControlName="customerMessage" matInput [rows]="5"></textarea>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+
+              <h5>Billing</h5>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group mt-0">
+                    <label class="mb-0">Daily Rate<span *ngIf="form.get('dailyRate').enabled">($5.00 - {{maxDailyRate |
+                        currency: 'USD'}})</span></label>
+                    <mat-form-field>
+                      <input formControlName="dailyRate" matInput type="number" [min]="5" />
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group mt-0">
+                    <label class="mb-0">Number of Days</label>
+                    <mat-form-field>
+                      <mat-select formControlName="numberOfDays">
+                        <mat-option *ngFor="let day of [1, 2]" [value]="day">
+                          {{ day }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div class="row justify-content-end">
+                <div class="col-md-8">
+                  <div class="row justify-content-between">
+                    <div class="col-md-auto d-flex font-weight-normal">Parking Charge:
+                      <h4 class="font-weight-bold ml-2">{{amount | currency: 'USD'}}</h4>
+                    </div>
+                    <div class="col-md-auto d-flex font-weight-normal">PMCS Fee:
+                      <h4 class="font-weight-bold ml-2">{{form.value.fee | currency: 'USD'}}</h4>
+                    </div>
+                    <div class="col-md-auto d-flex font-weight-normal">Total:
+                      <h4 class="font-weight-bold ml-2">{{(amount + form.value.fee) | currency: 'USD'}}</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-right mt-3">
+                <button mat-raised-button type="button" class="btn btn-danger mr-2" (click)="onCancel()">
+                  Cancel
+                </button>
+                <button mat-raised-button type="submit" class="btn btn-success" [disabled]="form.invalid || loading">
+                  Create Invoice
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm float-right" role="status"
+                    aria-hidden="true"></span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

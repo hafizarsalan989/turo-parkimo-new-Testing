@@ -1,0 +1,219 @@
+<app-data-table [tableId]="tableId" [columnDefs]="columnDefs" [defaultOrder]="{id: 3}" [actions]="actions"
+  [toolbar]="toolbar" [data]="invoices" pa>
+</app-data-table>
+
+<div class="modal fade" id="refundModal" tabindex="-1" role="dialog" aria-labelledby="refundModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <form [formGroup]="refundForm" (submit)="saveRefund()" class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Refund</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <mat-form-field appearance="fill" floatLabel="auto">
+          <textarea formControlName="reason" matInput rows="5" placeholder="Reason"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="fill" floatLabel="auto">
+          <input formControlName="amount" matInput placeholder="Amount" type="number" />
+          <span matPrefix class="mr-2">$</span>
+        </mat-form-field>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Cancel</button>
+        <button [disabled]="refundForm.invalid" mat-raised-button type="submit" class="btn btn-success">Process
+          Refund</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="chargeHostModal" tabindex="-1" role="dialog" aria-labelledby="chargeHostModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <form [formGroup]="chargeForm" (submit)="chargeHost()" class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Charge Host</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ng-container *ngIf="facilities.length > 0;else noFacilities">
+          <mat-form-field appearance="fill" floatLabel="auto">
+            <mat-select formControlName="facilityId" placeholder="Facility">
+              <mat-option *ngFor="let facility of facilities" [value]="facility.id">
+                {{ facility.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="fill" floatLabel="auto">
+            <input formControlName="amount" matInput placeholder="Amount" type="number" />
+            <span matPrefix class="mr-2">$</span>
+          </mat-form-field>
+          <mat-form-field appearance="fill" floatLabel="auto">
+            <textarea formControlName="description" matInput rows="5" placeholder="Description"></textarea>
+          </mat-form-field>
+          <mat-checkbox formControlName="facilityShare">Is Facility Share</mat-checkbox>
+        </ng-container>
+        <ng-template #noFacilities>
+          <h5 class="text-center">Company doesn't have facilities</h5>
+        </ng-template>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Cancel</button>
+        <button [disabled]="chargeForm.invalid" mat-raised-button type="submit" class="btn btn-success">Charge</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="invoiceSummaryModal" tabindex="-1" role="dialog" aria-labelledby="invoiceSummaryModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Invoice Summary</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-4">
+            <mat-form-field>
+              <mat-label>Select Year</mat-label>
+              <input [ngModel]="invoiceSummaryDate" matInput [matDatepicker]="dp" [readonly]="true"
+                [max]="maxInvoiceSummaryDate" [min]="minInvoiceSummaryDate" (click)="dp.open()">
+              <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+              <mat-datepicker #dp startView="multi-year" (yearSelected)="onChangeYear($event, dp)">
+              </mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="row justify-content-center">
+          <div class="col-md-3">
+            <div class="card card-stats my-0 mb-3">
+              <div class="card-header card-header-rose card-header-icon py-2">
+                <p class="card-category text-success">Total Amount</p>
+                <h3 class="card-title">{{ invoiceSummary?.annual?.totalAmount | currency: 'USD'}}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card card-stats my-0 mb-3">
+              <div class="card-header card-header-rose card-header-icon py-2">
+                <p class="card-category text-info">Total Paid</p>
+                <h3 class="card-title">{{ invoiceSummary?.annual?.totalPaid | currency: 'USD'}}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card card-stats my-0 mb-3">
+              <div class="card-header card-header-rose card-header-icon py-2">
+                <p class="card-category text-info">Total Paid(CC)</p>
+                <h3 class="card-title">{{ invoiceSummary?.annual?.amountPaidCC | currency: 'USD'}}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card card-stats my-0 mb-3">
+              <div class="card-header card-header-rose card-header-icon py-2">
+                <p class="card-category text-info">Total Paid(Fuel)</p>
+                <h3 class="card-title">{{ invoiceSummary?.annual?.amountPaidPMCSBank | currency: 'USD'}}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card card-stats my-0 mb-3">
+              <div class="card-header card-header-rose card-header-icon py-2">
+                <p class="card-category text-danger">Total Refunded</p>
+                <h3 class="card-title">{{ invoiceSummary?.annual?.totalRefund | currency: 'USD'}}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card card-stats my-0 mb-3">
+              <div class="card-header card-header-rose card-header-icon py-2">
+                <p class="card-category text-danger">Total Refunded(CC)</p>
+                <h3 class="card-title">{{ invoiceSummary?.annual?.amountRefundCC | currency: 'USD'}}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card card-stats my-0 mb-3">
+              <div class="card-header card-header-rose card-header-icon py-2">
+                <p class="card-category text-danger">Total Refunded(Fuel)</p>
+                <h3 class="card-title">{{ invoiceSummary?.annual?.amountRefundPMCSBank | currency: 'USD'}}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="invoiceSummaryAccordion" role="tablist">
+          <div *ngFor="let month of invoiceSummary?.monthly; index as i" class="card-collapse">
+            <div class="card-header" role="tab" [id]="'heading' + month.label">
+              <h5 class="mb-0">
+                <a class="collapsed" data-toggle="collapse" [href]="'#collapse' + month.label" aria-expanded="false"
+                  [attr.aria-controls]="'collapse' + month.label" (click)="getInvoices(i)">
+                  {{ month.label }} <small>(Total Ammount: {{ month.totalAmount | currency: 'USD'}}, Total Paid: {{
+                    month.totalPaid | currency: 'USD'}})</small>
+                  <i class="material-icons">keyboard_arrow_down</i>
+                </a>
+              </h5>
+            </div>
+            <div [id]="'collapse' + month.label" class="collapse" role="tabpanel" [attr.aria-labelledby]="month.label"
+              data-parent="#invoiceSummaryAccordion">
+              <div class="card-body">
+                <div class="row justify-content-center">
+                  <div class="col-md-3 text-center">
+                    <label>Total Amount</label>
+                    <p>{{ month.totalAmount | currency: 'USD' }}</p>
+                  </div>
+                  <div class="col-md-3 text-center">
+                    <label>Total Paid</label>
+                    <p>{{ month.totalPaid | currency: 'USD' }}</p>
+                  </div>
+                  <div class="col-md-3 text-center">
+                    <label>Total Paid(CC)</label>
+                    <p>{{ month.amountPaidCC | currency: 'USD' }}</p>
+                  </div>
+                  <div class="col-md-3 text-center">
+                    <label>Total Paid(Fuel)</label>
+                    <p>{{ month.amountPaidPMCSBank | currency: 'USD' }}</p>
+                  </div>
+                  <div class="col-md-3 text-center">
+                    <label>Total Refunded</label>
+                    <p>{{ month.totalRefund | currency: 'USD' }}</p>
+                  </div>
+                  <div class="col-md-3 text-center">
+                    <label>Total Refunded(CC)</label>
+                    <p>{{ month.amountRefundCC | currency: 'USD' }}</p>
+                  </div>
+                  <div class="col-md-3 text-center">
+                    <label>Total Refunded(Fuel)</label>
+                    <p>{{ month.amountRefundPMCSBank | currency: 'USD' }}</p>
+                  </div>
+                </div>
+                <app-table [columnDefs]="summaryColumns" [data]="month.invoices" [showSearch]="false">
+                  <ng-template #tdActions let-row="row">
+                    <button mat-raised-button type="button" class="btn btn-info" title="View"
+                      (click)="openInvoice(row.id)">
+                      <i class="material-icons">visibility</i>
+                    </button>
+                  </ng-template>
+                </app-table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

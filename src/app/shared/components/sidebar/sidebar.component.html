@@ -1,0 +1,89 @@
+<div class="logo text-center overflow-hidden">
+  <a>
+    <img [src]="logo" class="logo-img" (error)="logo='/assets/img/logo/logo-blue.png'" />
+  </a>
+</div>
+
+
+<div class="sidebar-wrapper">
+  <div *ngIf="isMobileMenu()">
+    <!-- <form class="navbar-form">
+      <span class="bmd-form-group">
+        <div class="input-group no-border">
+          <input type="text" value="" class="form-control" placeholder="Search...">
+          <button mat-raised-button type="submit" class="btn btn-white btn-round btn-just-icon">
+            <i class="material-icons">search</i>
+            <div class="ripple-container"></div>
+          </button>
+        </div>
+      </span>
+    </form> -->
+    <ul class="nav navbar-nav nav-mobile-menu mt-3">
+      <li *ngIf="hostMessages.length" class="nav-item dropdown">
+        <a class="nav-link" href="#pablo" id="messageDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
+          aria-expanded="false">
+          <i class="material-icons">notifications</i>
+          <span *ngIf="unread" class="notification">{{ unread }}</span>
+          <p>
+            <span class="d-lg-none d-md-block">Messages</span>
+          </p>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="messageDropdownMenuLink">
+          <a *ngFor="let msg of hostMessages" class="dropdown-item message pl-3" href="#"
+            (click)="openMessage($event, msg)"><i class="material-icons mr-1"
+              [ngClass]="{'text-danger': !msg.acknowledged}">{{ msg.acknowledged ? 'drafts' :
+              'mark_email_unread' }}</i><span class="notification">{{ msg.subject }}</span></a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link" href="#pablo" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
+          aria-expanded="false">
+          <i class="material-icons">person</i>
+          <p>
+            <span class="d-lg-none d-md-block">Preferences</span>
+          </p>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item ml-5" routerLink="my-account">My Account</a>
+          <a class="dropdown-item ml-5" (click)="logout()">Logout</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <ul class="nav">
+    <li routerLinkActive="active" *ngFor="let menuitem of menuItems" class="nav-item">
+      <!--If is a single link-->
+      <a [routerLink]="[menuitem.path]" *ngIf="menuitem.type === 'link'" class="nav-link">
+        <i class="material-icons">{{menuitem.icontype}}</i>
+        <p>{{menuitem.title}}</p>
+      </a>
+      <!--If it have a submenu-->
+      <a data-toggle="collapse" href="#{{menuitem.collapse}}" [attr.aria-expanded]="activeSub(menuitem.collapse)"
+        *ngIf="menuitem.type === 'sub'" (click)="updatePS()" class="nav-link">
+        <i class="material-icons">{{menuitem.icontype}}</i>
+        <p>{{menuitem.title}}<b class="caret"></b></p>
+      </a>
+
+      <!--Display the submenu items-->
+      <div id="{{menuitem.collapse}}" class="collapse" [ngClass]="{show: activeSub(menuitem.collapse)}"
+        *ngIf="menuitem.type === 'sub'">
+        <ul class="nav">
+          <li routerLinkActive="active" *ngFor="let childitem of menuitem.children" class="nav-item">
+            <a [routerLink]="[menuitem.path, childitem.path]" class="nav-link">
+              <span class="sidebar-mini">{{childitem.ab}}</span>
+              <span class="sidebar-normal">{{childitem.title}}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </li>
+    <li routerLinkActive="active" class="nav-item">
+      <!--If is a single link-->
+      <a href="https://www.parkmycarshare.com/appcontact" target="_blank" class="nav-link">
+        <i class="material-icons">help</i>
+        <p>Help</p>
+      </a>
+    </li>
+  </ul>
+
+</div>

@@ -1,0 +1,22 @@
+<div class="card-header">
+  <div class=" d-flex justify-content-between">
+    <h3 class="card-title text-center mt-3"> Reserved Spaces</h3>
+    <button mat-icon-button (click)="closeDialog()" class="close-btns" aria-label="Close"></button>
+  </div>
+  <div class="row align-items-center">
+    <div class="col-md-4 offset-md-4">
+      <h3 class="card-title text-center mt-3">
+       
+      </h3>
+    </div>
+    <div class="col-md-4 text-right">
+      <a href="https://www.parkmycarshare.com/reserved-space-inquiry" target="_blank" mat-raised-button
+        class="btn btn-info">
+        Request Reserved Spaces
+      </a>
+    </div>
+  </div>
+</div>
+<div class="card-body">
+  <app-reserved-space-list-table [companyId]="companyId"></app-reserved-space-list-table>
+</div>

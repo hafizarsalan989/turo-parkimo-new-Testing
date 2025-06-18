@@ -1,0 +1,108 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">Document Management</h3>
+          </div>
+          <div class="card-body">
+            <app-table [columnDefs]="columnDefs" [data]="tableData" [showSearch]="false">
+              <div class="row justify-content-between" action>
+                <div class="col-md-3">
+                  <mat-form-field>
+                    <mat-label>Document Type</mat-label>
+                    <mat-select [(ngModel)]="documentType" (ngModelChange)="getDocuments()">
+                      <mat-option value="Terms of Service">
+                        Terms of Service
+                      </mat-option>
+                      <mat-option value="Privacy Policy">
+                        Privacy Policy
+                      </mat-option>
+                      <mat-option value="Site Rules">
+                        Site Rules
+                      </mat-option>
+                      <mat-option value="Pricing Agreement">
+                        Pricing Agreement
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-auto">
+                  <button type="button" mat-raised-button class="btn btn-info" data-toggle="modal"
+                    data-target="#newVersionDocModal">
+                    New Version
+                  </button>
+                </div>
+              </div>
+            </app-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="newVersionDocModal" tabindex="-1" role="dialog" aria-labelledby="newVersionDocModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <form [formGroup]="documentForm" (submit)="saveDocument()" class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Add New Version</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row align-items-center">
+          <label class="col-md-4 col-form-label">Document Type:</label>
+          <div class="col-md-8">{{ documentForm.value.documentType }}</div>
+        </div>
+        <div *ngIf="currentMajorVersion && currentMinorVersion" class="row align-items-center">
+          <label class="col-md-4 col-form-label">Current Version:</label>
+          <div class="col-md-8">V{{ currentMajorVersion }}.{{ currentMinorVersion }}</div>
+        </div>
+        <div class="row align-items-center">
+          <label class="col-md-4 col-form-label">New Version:</label>
+          <div class="col-md-3">
+            <mat-form-field>
+              <mat-label>Major</mat-label>
+              <input formControlName="majorVersion" matInput type="number" [min]="0">
+            </mat-form-field>
+          </div>
+          <div class="col-md-3">
+            <mat-form-field>
+              <mat-label>Minor</mat-label>
+              <input formControlName="minorVersion" matInput type="number" [min]="0">
+            </mat-form-field>
+          </div>
+          <mat-error *ngIf="documentForm.errors?.version" class="ml-4">New version should be greater than current
+            version</mat-error>
+        </div>
+        <div class="row align-items-center">
+          <label class="col-md-4 col-form-label">Active Date:</label>
+          <div class="col-md-8">
+            <mat-form-field>
+              <input formControlName="activeDate" matInput [matDatepicker]="picker" [min]="minDate"
+                (click)="picker.open()">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row align-items-center">
+          <label class="col-md-4 col-form-label">Description:</label>
+          <div class="col-md-8">
+            <mat-form-field>
+              <textarea formControlName="description" matInput type="text"></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Cancel</button>
+        <button mat-raised-button type="submit" class="btn btn-success">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

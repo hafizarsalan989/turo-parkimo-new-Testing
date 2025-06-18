@@ -1,0 +1,74 @@
+<ul class="nav nav-pills nav-pills-warning px-0" role="tablist">
+  <li *ngFor="let facility of facilities; first as isFirst" class="nav-item">
+    <a class="nav-link" [ngClass]="{active: isFirst}" data-toggle="tab" [href]="'#facility' + facility.id"
+      role="tablist" (click)="selectFacility(facility.id)">
+      {{facility.name}}
+    </a>
+  </li>
+</ul>
+
+<div *ngIf="facilities.length > 0" class="tab-content tab-space px-3">
+  <div class="row align-items-center">
+    <!-- For Host User Type -->
+    <div *ngIf="user.turoUserType === 'host'" class="col-md-4 text-center">
+      <span class="text-gray font-weight-bold mr-2">Chase Cars Allowed:</span>
+      <span class="h3 font-weight-bold">{{ chaseCarsAllowed | number }}</span>
+    </div>
+
+    <!-- For Backoffice User Type -->
+    <div *ngIf="user.turoUserType === 'backoffice'" class="col-md-4 d-flex align-items-center">
+      <span class="text-gray font-weight-bold mr-2">Chase Cars Allowed:</span>
+      <mat-form-field class="w-25">
+        <input [formControl]="chaseCarAllowedCtrl" type="number" name="chaseCarsAllowed" matInput>
+        <mat-error *ngIf="chaseCarAllowedCtrl.hasError('required')" class="ml-1">
+          Please enter allowed chase car count
+        </mat-error>
+        <mat-error *ngIf="chaseCarAllowedCtrl.hasError('max')" class="ml-1">
+          Allowed chase car count should be less than <strong>99</strong>
+        </mat-error>
+        <mat-error *ngIf="chaseCarAllowedCtrl.hasError('min')" class="ml-1">
+          Allowed chase car count should be greater than the assigned one.
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-4 text-center">
+      <span class="text-gray font-weight-bold mr-2">Chase Cars Assigned:</span>
+      <span class="h3 font-weight-bold">{{fastpassIds.length | number}}</span>
+    </div>
+  </div>
+
+  <div class="row justify-content-between mt-4">
+    <div class="col">
+      <div class="row">
+        <div class="col-md-4">
+          <mat-form-field>
+            <input matInput [(ngModel)]="search" (ngModelChange)="onSearch()" placeholder="Search" type="text"
+              class="input-search">
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+    <div class="col-auto text-right">
+      <button mat-raised-button class="btn btn-success" [disabled]="chaseCarAllowedCtrl.invalid" (click)="save()">
+        Save
+      </button>
+    </div>
+  </div>
+  <div class="row my-3">
+    <div *ngFor="let fastPass of fastPasses" class="col-md-6">
+      <mat-checkbox [id]="fastPass.fastPassId" [checked]="fastPass.chaseVehicleEnabled"
+        [disabled]="isDisabled(fastPass.chaseVehicleEnabled)" [title]="fastPass.name" (change)="toggle($event)">
+        <div class="chase-car" [ngClass]="{'text-dark': !isDisabled(fastPass.chaseVehicleEnabled)}">
+          {{fastPass.name.split('(')[0].trim()}}</div>
+      </mat-checkbox>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 text-right">
+      <button mat-raised-button class="btn btn-success" [disabled]="chaseCarAllowedCtrl.invalid" (click)="save()">
+        Save
+      </button>
+    </div>
+  </div>
+</div>

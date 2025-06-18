@@ -1,0 +1,131 @@
+<div class="card-header d-flex justify-content-between">
+  <div *ngIf="message" class="alert" [ngClass]="'alert-' + messageType">
+    {{ message }}
+  </div>
+  
+  <h3 class="card-title text-center mt-3">Tag Ordering</h3>
+  <button mat-icon-button (click)="closeDialog()" class="close-btn" aria-label="Close">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<div class="card-body">
+  <h4 class="font-weight-bold">Shipping Address</h4>
+  <form [formGroup]="mailingForm">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group mt-0">
+          <label class="mb-0">Address 1</label>
+          <mat-form-field appearance="fill" floatLabel="auto">
+            <input formControlName="address1" matInput type="text" (blur)="saveShippingAddress()" />
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-group mt-0">
+          <label class="mb-0">Address 2</label>
+          <mat-form-field appearance="fill" floatLabel="auto">
+            <input formControlName="address2" matInput type="text" (blur)="saveShippingAddress()" />
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-group mt-0">
+          <label class="mb-0">City</label>
+          <mat-form-field appearance="fill" floatLabel="auto">
+            <input formControlName="city" matInput type="text" (blur)="saveShippingAddress()" />
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-group mt-0">
+          <label class="mb-0">State</label>
+          <mat-form-field>
+            <mat-select formControlName="state" (selectionChange)="saveShippingAddress()">
+              <mat-option *ngFor="let state of states" [value]="state.code">
+                {{ state.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-group mt-0">
+          <label class="mb-0">Zip</label>
+          <mat-form-field appearance="fill" floatLabel="auto">
+            <input formControlName="zip" matInput type="text" (blur)="saveShippingAddress()" />
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <h4 class="font-weight-bold">Tags</h4>
+  <form [formGroup]="form" (submit)="save()">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group mt-0">
+          <label class="mb-0">Select shipping option</label>
+          <mat-form-field>
+            <mat-select formControlName="shippingId">
+              <mat-option *ngFor="let preference of mailingPreferenceOptions" [value]="preference.id"
+                [disabled]="preference.name === 'Don\'t Ship Tags' && tags < activeSubscriptions">
+                {{ preference.name | titlecase }}: {{ preference.price | currency: 'USD' }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive mt-4">
+      <table class="table">
+        <thead class="text-primary">
+          <tr>
+            <th>Tag Type</th>
+            <th style="width: 25%">Quantity</th>
+            <th class="text-right" style="width: 15%">Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container formArrayName="orders">
+            <tr *ngFor="let order of orders.controls">
+              <ng-container [formGroup]="order">
+                <td>{{ order.value.name }}</td>
+                <td>
+                  <input type="number" formControlName="count" min="0" />
+                </td>
+                <td class="text-right">{{ (order.value.count * order.value.price) | currency: 'USD' }}</td>
+              </ng-container>
+            </tr>
+          </ng-container>
+          <tr>
+            <td></td>
+            <td class="font-weight-bold">Shipping</td>
+            <td class="text-right font-weight-bold">{{ shippingPrice | currency: 'USD' }}</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="font-weight-bold">Total</td>
+            <td class="text-right font-weight-bold">{{ totalPrice | currency: 'USD' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="text-right">
+      <button type="submit" mat-raised-button class="btn btn-success"
+        [disabled]="form.invalid || mailingForm.invalid|| loading">Purchase</button>
+    </div>
+  </form>
+
+  <hr />
+
+  <h5 class="font-weight-normal text-center text-info">How to select a tag type</h5>
+  <p class="information">Selecting a tag type if fairly simple. 99% of vehicles will use the window tag as it
+    is cheaper and
+    protected from the elements as it is located inside the vehicle. But some higher end vehicles have
+    "Metallic" type windshields that can interfere with the tag working properly. For these you would want a
+    headlight tag. They work just as well, just cost a bit more and have a more limited lifespan as they are
+    exposed to the elements. See <a href="https://info.glass.com/metallized-windshield-purpose/" target="_blank"
+      class="font-weight-bold">Here</a> for an article on identifying a metallic
+    windsheld</p>
+</div>

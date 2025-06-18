@@ -1,0 +1,11 @@
+<app-table [columnDefs]="columnDefs" [data]="tableData" [showSearch]="false">
+  <div class="row justify-content-end" action>
+    <div class="col-md-auto">
+      <button type="button" mat-raised-button class="btn btn-info" (click)="openNoteModal()">
+        Add Note
+      </button>
+    </div>
+  </div>
+</app-table>
+
+<app-notes-modal [referenceId]="companyId" [noteType]="noteType" (created)="onCreatedNote($event)"></app-notes-modal>

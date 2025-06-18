@@ -1,0 +1,61 @@
+<div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Notes</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ckeditor [editor]="editor" [config]="config" [formControl]="messageCtrl"></ckeditor>
+        <div class="d-flex flex-wrap mt-3">
+          <div *ngFor="let file of fileNames" class="d-flex align-items-center mb-2 mr-3 file">
+            <i class="material-icons">attachment</i>
+            <span class="ml-2 mr-3 name">{{file}}</span>
+            <i class="material-icons icon-delete" title="Delete File" (click)="onDeleteFile(file)">delete</i>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-auto">
+            <button mat-raised-button class="btn btn-info" (click)="onAttach()">
+              <i class="material-icons">attach_file</i>Attach files
+            </button>
+            <input id="noteFiles" type="file" multiple hidden (change)="onSelecteFiles($event)">
+          </div>
+          <div class="col text-right">
+            <button mat-raised-button class="btn btn-danger mr-2" (click)="messageCtrl.setValue('')">Clear</button>
+            <button mat-raised-button class="btn btn-success" [disabled]="messageCtrl.invalid"
+              (click)="onSave()">Save</button>
+          </div>
+        </div>
+
+        <ng-container *ngIf="isPreview">
+          <div *ngFor="let note of notes">
+            <div class="card">
+              <div class="card-body">
+                <div [innerHTML]="note.message"></div>
+                <div class="d-flex flex-wrap">
+                  <div *ngFor="let file of note.files" class="d-flex align-items-center mb-2 mr-3">
+                    <i class="material-icons mr-1">attachment</i>
+                    <span class="ml-2 mr-3 name">{{file.name}}</span>
+                    <i class="material-icons icon-delete" title="Download File" (click)="onDownload(file)">download</i>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <i>
+                    <small>
+                      <span class="mr-4">{{note.userEmail}}</span>
+                      <span>{{note.created | date: 'MM/dd/yyyy hh:mm a'}}</span>
+                    </small>
+                  </i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

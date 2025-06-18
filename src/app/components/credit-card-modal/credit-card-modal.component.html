@@ -1,0 +1,59 @@
+<div class="modal fade" [id]="modalId" tabindex="-1" role="dialog" [attr.aria-labelledby]="modalId + 'Label'"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="cc-form" [formGroup]="form" (submit)="saveCreditCard()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Credit Card</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <mat-form-field class="mb-2">
+            <mat-label>Card Number <small>(ex: XXXX XXXX XXXX XXXX)</small></mat-label>
+            <input matInput type="text" formControlName="cardNumber" mask="9999 9999 9999 9999 99">
+            <img [src]="cardIcon" matSuffix />
+            <mat-error *ngIf="form.controls.cardNumber.hasError('required')">Card number is required</mat-error>
+            <mat-error *ngIf="!form.controls.cardNumber.hasError('required') && form.controls.cardNumber.invalid">Card
+              number is not valid</mat-error>
+          </mat-form-field>
+          <div class="row mb-2">
+            <div class="col-6">
+              <mat-form-field>
+                <mat-label>Expiration</mat-label>
+                <input matInput [matDatepicker]="dp" formControlName="cardExpiry" [readonly]="true" [min]="minExpiry"
+                  (click)="dp.open()">
+                <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
+                </mat-datepicker>
+                <mat-error *ngIf="form.controls.cardExpiry.hasError('required')">Expiration is required</mat-error>
+                <mat-error
+                  *ngIf="!form.controls.cardExpiry.hasError('required') && form.controls.cardExpiry.invalid">Expiration
+                  date is not valid</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <mat-form-field>
+                <mat-label>CVV</mat-label>
+                <input matInput type="text" formControlName="cardCode" mask="9999">
+                <mat-error *ngIf="form.controls.cardCode.hasError('required')">Security code is required</mat-error>
+                <mat-error
+                  *ngIf="!form.controls.cardCode.hasError('required') && form.controls.cardCode.invalid">Security
+                  code is not valid</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button mat-raised-button type="button" class="btn btn-danger btn-link" (click)="cancel()">
+            Cancel
+          </button>
+          <button mat-raised-button type="submit" class="btn btn-success" [disabled]="form.invalid">
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

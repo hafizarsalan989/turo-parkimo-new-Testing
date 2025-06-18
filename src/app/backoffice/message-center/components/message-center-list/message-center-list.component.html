@@ -1,0 +1,68 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">Message Center</h3>
+          </div>
+          <div class="card-body">
+            <app-table [columnDefs]="columnDefs" [data]="tableData">
+              <div class="row justify-content-end" action>
+                <div class="col-md-auto">
+                  <button type="button" mat-raised-button class="btn btn-info" (click)="newMessage()">
+                    New Message
+                  </button>
+                </div>
+              </div>
+              <ng-template #tdActions let-row="row">
+                <button mat-raised-button type="button" class="btn btn-info mx-1" title="View"
+                  (click)="viewMessage(row)">
+                  <i class="material-icons">visibility</i>
+                </button>
+              </ng-template>
+            </app-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="viewMessageModal" tabindex="-1" role="dialog" aria-labelledby="viewMessageModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Messaging Details</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h5 class="font-weight-normal">Subject</h5>
+        <p>{{ selectedMessage?.subject }}</p>
+        <h5 class="font-weight-normal">Message</h5>
+        <ckeditor [editor]="editor" [data]="selectedMessage?.messageText" [disabled]="true"></ckeditor>
+        <div class="row mt-3">
+          <div class="col-md-auto">
+            <h5><span class="font-weight-normal">Users: </span>{{ selectedMessage?.recipients.length | number }}</h5>
+          </div>
+          <div class="col-md-auto">
+            <h5><span class="font-weight-normal">Acknowledged: </span>{{ selectedMessage?.acknowledgedCount | number }}
+            </h5>
+          </div>
+          <div class="col-md-auto">
+            <h5><span class="font-weight-normal">Percent Acknowledged: </span>{{ selectedMessage?.acknowledgedPercent |
+              number }}%</h5>
+          </div>
+        </div>
+        <app-table [columnDefs]="detailColumnDefs" [data]="detailTableData">
+        </app-table>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

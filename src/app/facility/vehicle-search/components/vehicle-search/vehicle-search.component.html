@@ -1,0 +1,167 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">Vehicle Search</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3">
+                <mat-form-field appearance="fill" floatLabel="auto">
+                  <input [formControl]="tagControl" matInput placeholder="Tag ID" type="text"
+                    [matAutocomplete]="auto1" />
+                  <mat-autocomplete #auto1="matAutocomplete" [displayWith]="displayFn"
+                    (optionSelected)="onOptionSelected()">
+                    <mat-option *ngFor="let tag of tags" [value]="tag">
+                      {{tag}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+              <div class="col-md-auto">
+                <button mat-raised-button class="btn btn-info btn-sm-block" (click)="clear()">
+                  Clear
+                </button>
+              </div>
+            </div>
+            <h5 *ngIf="!searched; else vehiclesRef" class="text-center text-info mt-5">
+              Search vehicle by Tag ID
+            </h5>
+            <ng-template #vehiclesRef>
+              <app-data-table [tableId]="tableId" [columnDefs]="columnDefs" [actions]="actions"
+                [data]="filteredVehicles" [lengthChange]="false" [searching]="false" [paging]="false" [info]="false">
+              </app-data-table>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-img-viewer [images]="previewImages" [index]="imageIndex" [show]="showPreview"
+  (onClose)="showPreview = false"></app-img-viewer>
+
+<div class="modal fade" id="vehicleDetailModal" tabindex="-1" role="dialog" aria-labelledby="vehicleDetailModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form [formGroup]="messageForm" (submit)="sendMessage()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Details</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 mb-2">
+              <div class="row">
+                <div class="col-5 font-weight-bold text-right pr-0">Vehicle Name: </div>
+                <div class="col-7">{{ selectedVehicle?.name }}</div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="row">
+                <div class="col-5 font-weight-bold text-right pr-0">Vehicle VIN: </div>
+                <div class="col-7">{{ selectedVehicle?.vin }}</div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="row">
+                <div class="col-5 font-weight-bold text-right pr-0">Vehicle Plate: </div>
+                <div class="col-7">{{ selectedVehicle?.licensePlate }}</div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="row">
+                <div class="col-5 font-weight-bold text-right pr-0">Vehicle Make: </div>
+                <div class="col-7">{{ selectedVehicle?.make }}</div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="row">
+                <div class="col-5 font-weight-bold text-right pr-0">Vehicle Model: </div>
+                <div class="col-7">{{ selectedVehicle?.model }}</div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="row">
+                <div class="col-5 font-weight-bold text-right pr-0">Vehicle Year: </div>
+                <div class="col-7">{{ selectedVehicle?.year }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-md-3 text-center">
+              <legend>Front</legend>
+              <img [src]="selectedVehicle?.imgFront" class="rounded" width="100%" alt="Front Image" role="button"
+                title="View large image" (click)="openImgViewer(selectedVehicle, 0)" />
+            </div>
+            <div class="col-md-3 text-center">
+              <legend>Driver Side</legend>
+              <img [src]="selectedVehicle?.imgDriverSide" class="rounded" width="100%" alt="Driver Side Image"
+                role="button" title="View large image" (click)="openImgViewer(selectedVehicle, 1)" />
+            </div>
+            <div class="col-md-3 text-center">
+              <legend>Passenger Side</legend>
+              <img [src]="selectedVehicle?.imgPassengerSide" class="rounded" width="100%" alt="Passenger Side Image"
+                role="button" title="View large image" (click)="openImgViewer(selectedVehicle, 2)" />
+            </div>
+            <div class="col-md-3 text-center">
+              <legend>Rear W/Plate</legend>
+              <img [src]="selectedVehicle?.imgRearWithPlate" class="rounded" width="100%" alt="Rear W/Plate Image"
+                role="button" title="View large image" (click)="openImgViewer(selectedVehicle, 3)" />
+            </div>
+          </div>
+          <div class="mt-4">
+            <mat-form-field appearance="fill" floatLabel="auto">
+              <input formControlName="subject" matInput placeholder="Subject" type="text" />
+            </mat-form-field>
+            <textarea formControlName="message" class="form-control" rows="5" placeholder="Message"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">
+            Cancel
+          </button>
+          <button mat-raised-button type="submit" class="btn btn-success" [disabled]="loading || messageForm.invalid">
+            Send
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="vehicleSearchMessageModal" tabindex="-1" role="dialog"
+  aria-labelledby="vehicleSearchMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form [formGroup]="messageForm" (submit)="sendMessage()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Send Message</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <mat-form-field appearance="fill" floatLabel="auto">
+            <input formControlName="subject" matInput placeholder="Subject" type="text" />
+          </mat-form-field>
+          <textarea formControlName="message" class="form-control" rows="5" placeholder="Message"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">
+            Cancel
+          </button>
+          <button mat-raised-button type="submit" class="btn btn-success" [disabled]="loading || messageForm.invalid">
+            Send
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

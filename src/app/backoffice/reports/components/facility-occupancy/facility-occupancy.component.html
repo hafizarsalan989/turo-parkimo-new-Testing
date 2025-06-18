@@ -1,0 +1,71 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">Facility Occupancy</h3>
+          </div>
+          <div class="card-body">
+            <div class="row justify-content-between">
+              <div class="col-md-4">
+                <div class="row align-items-baseline">
+                  <div class="col-md">
+                    <mat-form-field>
+                      <mat-label>Facility</mat-label>
+                      <mat-select [ngModel]="facilityIds" [multiple]="true"
+                        (selectionChange)="onSelectFacilities($event)" (openedChange)="onClosedSelect($event)">
+                        <mat-select-trigger>{{ facilitiesLabel }}</mat-select-trigger>
+                        <mat-option value="all">
+                          All
+                        </mat-option>
+                        <mat-option *ngFor="let facility of facilities" [value]="facility.id">
+                          {{ facility.name }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md">
+                    <app-daterange-picker [defaultRange]="defaultRange" [minDate]="minDate"
+                      (rangeChanged)="onRangeChanged($event)"></app-daterange-picker>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-auto">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <div class="btn-group">
+                      <button *ngFor="let slot of slots" mat-raised-button type="button" class="btn"
+                        [ngClass]="{'btn-info': currentSlot === slot.value}" (click)="toggleData(slot.value)">{{
+                        slot.key
+                        }}</button>
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <div class="btn-group">
+                      <button *ngFor="let type of chartTypes" mat-raised-button mat-min-fab type="button"
+                        class="btn btn-fab" [ngClass]="{'btn-warning': currentType === type.value}"
+                        (click)="toggleType(type.value)">
+                        <i class="material-icons">{{ type.key }}</i>
+                      </button>
+                    </div>
+                  </div>
+                  <div *ngIf="currentType === 'table'" class="col-auto">
+                    <button mat-raised-button mat-min-fab type="button" class="btn btn-info btn-fab"
+                      (click)="exportCsv()">
+                      <i class="material-icons">download</i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <app-chart *ngIf="currentType !== 'table'" [series]="series" [xaxis]="xaxis" [chart]="chart"
+              [plotOptions]="plotOptions"></app-chart>
+            <app-table *ngIf="currentType === 'table'" [columnDefs]="columnDefs" [data]="tableData"
+              [showSearch]="false"></app-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

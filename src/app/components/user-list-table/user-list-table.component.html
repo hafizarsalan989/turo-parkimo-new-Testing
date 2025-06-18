@@ -1,0 +1,48 @@
+<app-data-table [tableId]="tableId" [columnDefs]="columnDefs" [actions]="actions" [data]="users">
+</app-data-table>
+
+<div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <form [formGroup]="passwordForm" (submit)="savePassword()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Reset Password</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <mat-form-field appearance="fill" floatLabel="auto">
+            <input formControlName="password" matInput type="password" placeholder="Password" />
+            <mat-error *ngIf="passwordForm.get('password').hasError('required')" class="ml-1">
+              New password is <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="passwordForm.get('password').hasError('minlength')" class="ml-1">
+              Password should be more than <strong>6 characters</strong>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill" floatLabel="auto">
+            <input formControlName="confirmPassword" matInput type="password" [errorStateMatcher]="passwordMatcher"
+              placeholder="Confirm Password" />
+            <mat-error *ngIf="passwordForm.get('confirmPassword').hasError('required')" class="ml-1">
+              Confirm password is <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="passwordForm.get('confirmPassword').hasError('notSame')" class="ml-1">
+              Password should be <strong>matched</strong>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="modal-footer">
+          <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">
+            Cancel
+          </button>
+          <button mat-raised-button type="submit" class="btn btn-success"
+            [disabled]="loadingPassword || passwordForm.invalid">
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

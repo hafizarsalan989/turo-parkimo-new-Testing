@@ -1,0 +1,12 @@
+
+::ng-deep .cdk-overlay-connected-position-bounding-box
+{
+  z-index: 5001 !important;
+}
+/* Remove border and background from dialog container */
+.no-border-dialog .mat-dialog-container {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+}

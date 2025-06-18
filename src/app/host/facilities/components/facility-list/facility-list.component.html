@@ -1,0 +1,137 @@
+<div class="main-content facility-list">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">Facilities</h3>
+          </div>
+          <div class="card-body pt-0">
+            <div class="row">
+              <div class="col-md-3 col-12">
+                <mat-form-field appearance="fill" floatLabel="auto">
+                  <input [formControl]="searchTermCtrl" matInput type="text" placeholder="Search..." />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row no-gutters">
+              <div class="col-md-5 border-top border-bottom list">
+                <h5 *ngIf="filteredFacilityMarkets.length === 0" class="border-left border-right text-center py-3 m-0">
+                  No data</h5>
+                <div *ngFor="let facilityMarket of filteredFacilityMarkets">
+                  <div class="p-3 border-left border-right shadow group">
+                    <h4 class="m-0 font-weight-bold text-info">
+                      {{ facilityMarket.market.name }}
+                    </h4>
+                  </div>
+                  <div *ngFor="let facility of facilityMarket.facilities"
+                    [ngClass]="{'border-warning': facility.id === hoveredFacility?.id}"
+                    (mouseenter)="onMouseEnter(facility)" (mouseleave)="onMouseOut()"
+                    class="row no-gutters align-items-center p-3 border">
+                    <div class="col-md">
+                      <div class="row align-items-center">
+                        <div class="col-md-auto">
+                          <img [src]="facility.imageUrl" class="facility-logo" alt="Facility Logo" />
+                          <img *ngIf="facility.status === 'comingsoon'" src="assets/img/coming-soon.png"
+                            class="coming-soon" />
+                          <img *ngIf="facility.status === 'soldout'" src="assets/img/soldout.png" class="coming-soon" />
+                        </div>
+                        <div class="col-md">
+                          <h4 class="font-weight-bold m-0">{{ facility.name }}<br />
+                            <small class="text-warning">{{facility.address.city }}, {{facility.address.state}} {{
+                              facility?.address.zip }}</small>
+                          </h4>
+                          <button mat-raised-button class="btn btn-info btn-link btn-sm px-0 m-0 mr-2" type="button"
+                            (click)="viewFacility(facility)">
+                            View Details
+                            <i class="material-icons">arrow_forward</i>
+                          </button>
+                          <br />
+                          <button *ngIf="facility.status === 'comingsoon'" mat-raised-button
+                            class="btn btn-primary btn-link btn-sm px-0 m-0" type="button" (click)="viewWatchList()">
+                            Join Wait List
+                            <i class="material-icons">open_in_new</i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-auto text-center">
+                      <h5 class="font-weight-normal text-warning mt-0">Daliy Parking From<br />
+                        <small *ngIf="facility.discountPercent" class="text-danger">
+                          {{ facility.discountPercent | percent }} off<br /></small>
+                        <span class="text-dark">
+                          <span *ngIf="facility.discountPercent"><del>
+                              {{ facility.amount | currency: 'USD' }}</del> Now
+                          </span>
+                          <b>{{ facility.discountedAmount | currency: 'USD' }}</b>
+                        </span>
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- <div class="col-md-5 border-top border-bottom list">
+                <div *ngFor="let group of groupedFacilities | keyvalue">
+                  <h4 class="m-0 p-3 border-left border-right font-weight-bold text-info shadow group">{{ group.key }}
+                  </h4>
+                  <div *ngFor="let facility of group.value"
+                    [ngClass]="{'border-warning': facility.id === hoveredFacility?.id}"
+                    (mouseenter)="onMouseEnter(facility)" (mouseleave)="onMouseOut()"
+                    class="row no-gutters align-items-center p-3 border">
+                    <div class="col-md">
+                      <div class="row align-items-center">
+                        <div class="col-md-auto">
+                          <img [src]="facility.imageUrl" class="facility-logo" alt="Facility Logo" />
+                          <img *ngIf="facility.status === 'comingsoon'" src="assets/img/coming-soon.png"
+                            class="coming-soon" />
+                        </div>
+                        <div class="col-md">
+                          <h4 class="font-weight-bold m-0">{{ facility.name }}<br />
+                            <small class="text-warning">{{facility.address.city }}, {{facility.address.state}} {{
+                              facility?.address.zip }}</small>
+                          </h4>
+                          <button mat-raised-button class="btn btn-info btn-link btn-sm px-0 m-0" type="button"
+                            (click)="viewFacility(facility)">
+                            View Details
+                            <i class="material-icons">arrow_forward</i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-auto text-center">
+                      <h5 class="font-weight-normal text-warning mt-0">Daliy Parking From<br />
+                        <small *ngIf="facility.discountPercent" class="text-danger">{{ facility.discountPercent |
+                          percent }} off<br /></small>
+                        <span class="text-dark">
+                          <span *ngIf="facility.discountPercent"><del>{{ facility.amount | currency: 'USD' }}</del> Now
+                          </span>
+                          <b>{{ facility.discountedAmount | currency: 'USD' }}</b>
+                        </span>
+                      </h5>
+                      <button mat-raised-button class="btn btn-success btn-sm" type="button"
+                        [disabled]="facility.status === 'comingsoon'" (click)="buyCity Pass(facility.id)">
+                        Buy City Pass
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div> -->
+              <div class="col-md-7">
+                <div id="top-left-control" class="card">
+                  <div class="card-body p-2">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <input id="pac-input" matInput type="text" placeholder="Search..." />
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div id="facility-map"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-facility-details-modal [facility]="selectedFacility"></app-facility-details-modal>

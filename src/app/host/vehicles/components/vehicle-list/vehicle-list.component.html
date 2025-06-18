@@ -1,0 +1,145 @@
+<!-- Responsive and Professional Vehicle List UI -->
+<div class="main-content ">
+  <div class="container-fluid">
+    <div class="card shadow rounded-3">
+      <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-center">
+        <h3 class="text-center text-md-start mb-3 mb-md-0">Vehicle List</h3>
+
+        <div class="d-flex flex-column flex-md-row align-items-center gap-2">
+          <div class="col-md-auto">
+            <button mat-raised-button href="#pablo" class="dropdown-toggle btn btn-warning btn-block"
+              data-toggle="dropdown">
+              Bulk Edit
+              <b class="caret"></b>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-left">
+              <li>
+                <a href="#" (click)="onBulkActivate($event)">Activate</a>
+              </li>
+            </ul>
+          </div>
+
+          <ng-container *ngIf="hasActiveVehicleSubscription">
+            <button mat-raised-button class="btn btn-info" (click)="buyTags()">
+              Extra Tag Ordering
+            </button>
+          </ng-container>
+
+          <button mat-raised-button class="btn btn-info" (click)="reservSpace()">
+            Reserved Spaces
+          </button>
+          <button mat-raised-button class="btn btn-success" (click)="addVehicle()">
+            <i class="material-icons">add</i> Add Vehicle
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="row g-3 mb-4">
+          
+        </div>
+
+        <!-- <app-data-table [tableId]="tableId" [columnDefs]="columnDefs" [data]="filteredVehicles" [pageLength]="25"
+          paginationLayout="both">
+        </app-data-table> -->
+        <app-data-table [tableId]="tableId" [columnDefs]="columnDefs" [data]="filteredVehicles" [pageLength]="25"
+          paginationLayout="both"  [disablePagination]="true" [customFilters]="customFilters">
+        </app-data-table>
+
+
+      </div>
+    </div>
+
+    <!-- Modals for actions -->
+    <app-cancel-permit-modal [modalId]="cancelPermitModalId"
+      [permit]="{ id: selectedVehicle?.subscriptionId, facility: { name: selectedVehicle?.subscriptionMarketName } }"
+      (cancel)="onCancelPermit()">
+    </app-cancel-permit-modal>
+
+    <app-permit-replace-tag-modal [modalId]="replaceTagModalId" [companyId]="host?.id"
+      [permitId]="selectedVehicle?.subscriptionId" [prevTag]="selectedVehicle?.subscriptionTag"
+      (replace)="onChangeTag()">
+    </app-permit-replace-tag-modal>
+
+    <div class="modal fade" [id]="changeMarketModalId" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <form [formGroup]="facilityForm" (ngSubmit)="onSaveFacility()">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Change Facility</h5>
+              <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                <i class="material-icons">clear</i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <mat-form-field appearance="fill" class="w-100">
+                <mat-select formControlName="facilityId" placeholder="Select facility">
+                  <mat-option *ngFor="let facility of facilities" [value]="facility.id">{{ facility.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" [disabled]="facilityForm.invalid">Save</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal fade" [id]="addUnlimitedPassModalId" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <form [formGroup]="unlimitedPassForm">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Unlimited Pass</h5>
+              <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                <i class="material-icons">clear</i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <mat-form-field appearance="fill" class="w-100">
+                <mat-select formControlName="facilityId" placeholder="Select facility">
+                  <ng-container *ngFor="let facility of unlimitedPassFacilities">
+                    <ng-container *ngFor="let carPark of facility.carParks">
+                      <mat-option *ngIf="carPark.addOnUnlimitedRates.currentRate?.amount > 0"
+                        [value]="facility.id + ' - ' + carPark.id">
+                        {{ facility.name }} - {{ carPark.name }}, {{ carPark.addOnUnlimitedRates.currentRate?.amount |
+                        currency:'USD' }}/Month
+                      </mat-option>
+                    </ng-container>
+                  </ng-container>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-success" [disabled]="unlimitedPassForm.invalid"
+                (click)="onSaveUnlimitedPass()">Next</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal fade" [id]="actionsModalId" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ selectedVehicle?.name }}</h5>
+            <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              <i class="material-icons">clear</i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div *ngFor="let item of selectedVehicle?.actions">
+              <button mat-raised-button class="btn btn-primary btn-block mb-2" (click)="onClickAction(item)">
+                {{ item }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

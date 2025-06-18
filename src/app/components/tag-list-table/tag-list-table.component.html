@@ -1,0 +1,52 @@
+<app-table [columnDefs]="columnDefs" [data]="tableData" [showSearch]="false">
+  <div class="row justify-content-end" action>
+    <div class="col-md-auto">
+      <button type="button" mat-raised-button class="btn btn-info" data-toggle="modal" data-target="#newTagModal">
+        Add Tag
+      </button>
+    </div>
+  </div>
+</app-table>
+
+<div class="modal fade" id="newTagModal" tabindex="-1" role="dialog" aria-labelledby="newTagModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <form [formGroup]="form" (submit)="save()" class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">New Tag</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <mat-form-field>
+              <mat-label>Start Tag</mat-label>
+              <input formControlName="startTag" matInput />
+              <mat-error *ngIf="form.get('startTag').hasError('required')">
+                Start tag is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <mat-label>End Tag</mat-label>
+              <input formControlName="endTag" matInput [errorStateMatcher]="endTagErrorMatcher" />
+              <mat-error *ngIf="form.get('endTag').hasError('required')">
+                End tag is <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="form.get('endTag').hasError('greaterThan')">
+                End tag should be greater than <strong>start tag</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Cancel</button>
+        <button [disabled]="form.invalid" mat-raised-button type="submit" class="btn btn-success">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

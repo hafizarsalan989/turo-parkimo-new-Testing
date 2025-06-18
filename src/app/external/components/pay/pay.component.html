@@ -1,0 +1,604 @@
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div *ngIf="invoiceDetail" class="col-md-10 py-5 px-4 bg-white rounded invoice">
+      <img [src]="logo" height="72" class="mb-4" />
+
+      <div class="row">
+        <div class="col-md-6">
+          <div *ngIf="!isFacilitySelfPay" class="mb-5">
+            <label class="message-label">Message from Park My Share</label>
+            <p [innerHTML]="form.value.message"></p>
+          </div>
+          <div>
+            <div class="row">
+              <div class="col-md-6 font-weight-normal mb-1">Receipt Number:</div>
+              <div class="col-md-6">{{ invoiceDetail?.invoiceNumber }}</div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 font-weight-normal mb-1">Status:</div>
+              <div class="col-md-6">{{ status | titlecase }}</div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 font-weight-normal mb-1">Payment Attempts:</div>
+              <div class="col-md-6">{{ invoiceDetail?.tries }} of {{ invoiceDetail?.maxTries }}</div>
+            </div>
+            <div *ngIf="pickUpDate" class="row">
+              <div class="col-md-6 font-weight-normal mb-1">Pick Up Date:</div>
+              <div class="col-md-6">{{ pickUpDate | date: 'MM/dd/yyyy hh:mm a': 'UTC' }}</div>
+            </div>
+            <div *ngIf="dropOffDate" class="row">
+              <div class="col-md-6 font-weight-normal mb-1">Return Date:</div>
+              <div class="col-md-6">{{ dropOffDate | date: 'MM/dd/yyyy hh:mm a': 'UTC' }}</div>
+            </div>
+            <div *ngIf="numberOfPassengers" class="row">
+              <div class="col-md-6 font-weight-normal mb-1">Number Of Passengers:</div>
+              <div class="col-md-6">{{ numberOfPassengers }}</div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 font-weight-normal mb-1">Receipt Date:</div>
+              <div class="col-md-6">{{ invoiceDetail?.invoiceDate | date: 'MM/dd/yyyy hh:mm a' }}</div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 font-weight-normal mb-1">Payment Date:</div>
+              <div class="col-md-6">{{ invoiceDetail?.paymentDate | date: 'MM/dd/yyyy hh:mm a' }}</div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 font-weight-normal mb-1">CC Number:</div>
+              <div class="col-md-6">{{ invoiceDetail?.paymentMethod }}</div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 font-weight-normal mb-1">Amount Paid:</div>
+              <div class="col-md-6">{{ invoiceDetail?.totalPaid | currency: 'USD' }}</div>
+            </div>
+            <div *ngIf="reservationId" class="row">
+              <div class="col-md-6 font-weight-normal mb-1">Reservation ID:</div>
+              <div class="col-md-6">{{ reservationId }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <form *ngIf="status === 'due' || status === 'past due' || status === 'failed'" [formGroup]="form"
+            (submit)="pay()">
+            <div class="row mb-2">
+              <div class="col-md-6">
+                <mat-form-field>
+                  <mat-label>Email</mat-label>
+                  <input matInput type="email" formControlName="email">
+                  <mat-error *ngIf="form.controls.email.hasError('required')">Email is required</mat-error>
+                  <mat-error *ngIf="form.controls.email.hasError('pattern') && form.controls.cardCode.invalid">Email is
+                    not valid</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-6">
+                <mat-form-field>
+                  <mat-label>Zip</mat-label>
+                  <input matInput type="text" formControlName="billingZip">
+                  <mat-error *ngIf="form.controls.billingZip.hasError('required')">Zip is required</mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div *ngIf="!isFacilitySelfPay" class="row">
+              <div class="col-md-7 mb-4">
+                <div class="row align-items-center">
+                  <div class="col-auto pr-0">
+                    <i class="material-icons" #tooltip="matTooltip"
+                      matTooltip="We use your pick up and return information for shuttle planning purposes."
+                      (click)="tooltip.toggle()">help</i>
+                  </div>
+                  <div class="col">
+                    <mat-form-field>
+                      <mat-label>Pick Up Date</mat-label>
+                      <input formControlName="pickupDate" matInput [matDatepicker]="pickUpPicker" [min]="minPickUpDate"
+                        (click)="pickUpPicker.open()">
+                      <mat-datepicker-toggle matSuffix [for]="pickUpPicker"></mat-datepicker-toggle>
+                      <mat-datepicker #pickUpPicker></mat-datepicker>
+                      <mat-error *ngIf="form.controls.pickupDate.hasError('required')">Pick up date is
+                        required</mat-error>
+                      <mat-hint class="text-info"><em>This is the date you have scheduled to pick up the rental
+                          vehicle.</em></mat-hint>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-5">
+                <mat-form-field>
+                  <mat-label>Pick Up Hour</mat-label>
+                  <mat-select formControlName="pickupTime">
+                    <mat-option *ngFor="let item of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]"
+                      [value]="item">
+                      {{item}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div *ngIf="isQuick && !isFacilitySelfPay" class="row">
+              <div class="col-md-7 mb-4">
+                <mat-form-field>
+                  <mat-label>Return Date</mat-label>
+                  <input formControlName="dropoffDate" matInput [matDatepicker]="dropOffPicker" [min]="minDropOffDate"
+                    [disabled]="!form.value.pickupDate" (click)="dropOffPicker.open()">
+                  <mat-datepicker-toggle matSuffix [for]="dropOffPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #dropOffPicker></mat-datepicker>
+                  <mat-error *ngIf="form.controls.dropoffDate.hasError('required')">Return date is
+                    required</mat-error>
+                  <mat-hint class="text-info"><em>This is the date you have scheduled to return the rental
+                      vehicle.</em></mat-hint>
+                </mat-form-field>
+              </div>
+              <div class="col-md-5">
+                <mat-form-field>
+                  <mat-label>Return Hour</mat-label>
+                  <mat-select formControlName="dropoffTime">
+                    <mat-option *ngFor="let item of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]"
+                      [value]="item">
+                      {{item}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div *ngIf="requireLicensePlate" [ngClass]="requireLastName ? 'col-6' : 'col-12'">
+                <mat-form-field>
+                  <mat-label>Rental License Plate</mat-label>
+                  <input matInput type="text" formControlName="customerLicensePlate">
+                  <mat-error *ngIf="form.controls.customerLicensePlate.hasError('required')">Rental license plate is
+                    required</mat-error>
+                </mat-form-field>
+              </div>
+              <div *ngIf="requireLastName" [ngClass]="requireLicensePlate ? 'col-6' : 'col-12'">
+                <mat-form-field>
+                  <mat-label>Last Name</mat-label>
+                  <input matInput type="text" formControlName="customerLastName">
+                  <mat-error *ngIf="form.controls.customerLastName.hasError('required')">Last name is
+                    required</mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div *ngIf="!isFacilitySelfPay" [ngClass]="isQuick ? 'col-md-6' : 'col-md-12'">
+                <mat-form-field>
+                  <mat-label>Reservation ID</mat-label>
+                  <input matInput type="text" formControlName="reservationId">
+                  <mat-error *ngIf="form.controls.reservationId.hasError('required')">Reservation ID is
+                    required</mat-error>
+                </mat-form-field>
+              </div>
+              <div *ngIf="isQuick && !isFacilitySelfPay" class="col-md-6">
+                <mat-form-field>
+                  <mat-label>Number Of Passengers</mat-label>
+                  <mat-select formControlName="numberOfPassengers">
+                    <mat-option *ngFor="let item of [1,2,3,4,5,6,7,8,9]" [value]="item">
+                      {{item}}
+                    </mat-option>
+                    <mat-option [value]="10">
+                      10+
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <mat-form-field class="mb-2">
+              <mat-label>Card Number <small>(ex: XXXX XXXX XXXX XXXX)</small></mat-label>
+              <input matInput type="text" formControlName="cardNumber" mask="9999 9999 9999 9999 99">
+              <img [src]="cardIcon" matSuffix />
+              <mat-error *ngIf="form.controls.cardNumber.hasError('required')">Card number is required</mat-error>
+              <mat-error *ngIf="!form.controls.cardNumber.hasError('required') && form.controls.cardNumber.invalid">Card
+                number is not valid</mat-error>
+            </mat-form-field>
+            <div class="row mb-2">
+              <div class="col-6">
+                <mat-form-field MMYY>
+                  <mat-label>Expiration</mat-label>
+                  <input matInput [matDatepicker]="dp" formControlName="expirationDate" [readonly]="true" [min]="min"
+                    (click)="dp.open()">
+                  <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                  <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
+                  </mat-datepicker>
+                  <mat-error *ngIf="form.controls.expirationDate.hasError('required')">Expiration is
+                    required</mat-error>
+                  <mat-error
+                    *ngIf="!form.controls.expirationDate.hasError('required') && form.controls.expirationDate.invalid">Expiration
+                    date is not valid</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-6">
+                <mat-form-field>
+                  <mat-label>CVV</mat-label>
+                  <input matInput type="text" formControlName="cardCode" mask="9999">
+                  <mat-error *ngIf="form.controls.cardCode.hasError('required')">Security code is required</mat-error>
+                  <mat-error
+                    *ngIf="!form.controls.cardCode.hasError('required') && form.controls.cardCode.invalid">Security
+                    code is not valid</mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="text-right">
+              <button class="btn btn-success btn-block" type="submit" [disabled]="form.invalid || loading">
+                Pay
+                <span *ngIf="loading" class="spinner-border spinner-border-sm float-right" role="status"
+                  aria-hidden="true"></span>
+              </button>
+            </div>
+            <p>
+              By clicking pay you agree to our Damage and Loss Disclaimer <a
+                href="https://parkmyshare.com/disclaimer-guestpay" target="_blank"
+                class="btn btn-sm btn-link btn-info px-0">HERE</a> & our Privacy Statement <a
+                href="https://parkmyshare.com/privacy-policy" target="_blank"
+                class="btn btn-sm btn-link btn-info px-0">HERE</a>.
+            </p>
+          </form>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+        </div>
+        <div class="col-md-6 offset-md-6">
+
+        </div>
+      </div>
+
+      <div class="table-responsive mt-4">
+        <table class="table">
+          <thead class="text-primary">
+            <tr>
+              <th>Description</th>
+              <th style="width: 15%">Quantity</th>
+              <th style="width: 15%">Amount</th>
+              <th style="width: 15%">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of invoiceDetail?.products">
+              <td>{{ product.description }}</td>
+              <td>{{ product.quantity | number }}</td>
+              <td>{{ product.rate | currency: 'USD' }}</td>
+              <td>{{ product.amount | currency: 'USD' }}</td>
+            </tr>
+            <tr *ngIf="tripCharges.length > 0">
+              <td [colSpan]="4">Trip Fees</td>
+            </tr>
+            <tr *ngFor="let tripCharge of tripCharges">
+              <td>{{ tripCharge.description }}</td>
+              <td>{{ 1 | number }}</td>
+              <td>{{ tripCharge.amount | currency: 'USD' }}</td>
+              <td>{{ tripCharge.amount | currency: 'USD' }}</td>
+            </tr>
+            <tr>
+              <td [colSpan]="3" class="text-right font-weight-bold pr-5">Total</td>
+              <td class="font-weight-bold">{{ totalAmount | currency: 'USD' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="row justify-content-end">
+        <div class="col-md-auto">
+          <p class="font-weight-bold">Thank you!</p>
+          <p>Payment required for vehicle exit</p>
+          <p>If you have any issues contact at<br /><a [href]="'mailto:' + invoiceDetail?.supportEmail">{{
+              invoiceDetail?.supportEmail }}</a></p>
+        </div>
+      </div>
+
+      <div *ngIf="invoiceDetail?.refunds.length > 0" class="table-responsive mt-4">
+        <h4 class="font-weight-bold">Refunds</h4>
+        <table class="table">
+          <thead class="text-primary">
+            <tr>
+              <th style="width: 20%">Date</th>
+              <th style="width: 20%">Amount</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let refund of invoiceDetail?.refunds">
+              <ng-container *ngIf="refund.isRefunded || refund.isVoided">
+                <td>{{ refund.created | date }}</td>
+                <td>{{ refund.amount | currency: 'USD' }}</td>
+                <td>{{ refund.reason }}</td>
+              </ng-container>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h4 class="font-weight-bold">{{ title }}</h4>
+        <p>{{ invoiceDetail?.companyAddress.address1 }} {{ invoiceDetail?.companyAddress.address2 }}<br />{{
+          invoiceDetail?.companyAddress.city }}, {{ invoiceDetail?.companyAddress.state }} {{
+          invoiceDetail?.companyAddress.zip }}</p>
+        <p></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="container my-5">
+  <div class="row justify-content-center">
+    <div *ngIf="invoiceDetail" class="col-md-10 py-5 px-4 bg-white rounded invoice">
+      <div class="row">
+        <div class="col-md-6">
+          <label class="message-label">{{isHostPay ? 'Host Pay Guest Exit Fee Invoice' : 'Message from your
+            Host'}}</label>
+          <p *ngIf="!isHostPay" [innerHTML]="form.value.message"></p>
+        </div>
+        <div class="col-md-6">
+          <form *ngIf="status === 'due' || status === 'past due' || status === 'failed'" [formGroup]="form"
+            (submit)="pay()">
+            <div *ngIf="!isHostPay" class="row mb-2">
+              <div class="col-6">
+                <mat-form-field>
+                  <mat-label>Email</mat-label>
+                  <input matInput type="email" formControlName="email">
+                  <mat-error *ngIf="form.controls.email.hasError('required')">Email is required</mat-error>
+                  <mat-error *ngIf="form.controls.email.hasError('pattern') && form.controls.cardCode.invalid">Email is
+                    not valid</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-6">
+                <mat-form-field>
+                  <mat-label>Zip</mat-label>
+                  <input matInput type="text" formControlName="billingZip">
+                  <mat-error *ngIf="form.controls.billingZip.hasError('required')">Zip is required</mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-12">
+                <mat-form-field MMDDYYYY>
+                  <mat-label>Pick Up Date</mat-label>
+                  <input matInput [matDatepicker]="dpPickUp" formControlName="pickupDate" [readonly]="true" [min]="min"
+                    (click)="dpPickUp.open()">
+                  <mat-datepicker-toggle matSuffix [for]="dpPickUp"></mat-datepicker-toggle>
+                  <mat-datepicker #dpPickUp></mat-datepicker>
+                  <mat-error *ngIf="form.controls.pickupDate.hasError('required')">Pick up date is required</mat-error>
+                  <mat-hint class="text-info"><em>This is the date {{isHostPay ? 'your guest has' : 'you have'}}
+                      scheduled to pick up the rental vehicle.</em></mat-hint>
+                </mat-form-field>
+              </div>
+            </div>
+            <ng-container *ngIf="!isHostPay && isQuick">
+              <div class="row mb-2">
+                <div class="col-12">
+                  <mat-form-field MMDDYYYY>
+                    <mat-label>Drop Off Date</mat-label>
+                    <input matInput [matDatepicker]="dpDropoff" formControlName="dropoffDate" [readonly]="true"
+                      [min]="min" (click)="dpDropoff.open()">
+                    <mat-datepicker-toggle matSuffix [for]="dpDropoff"></mat-datepicker-toggle>
+                    <mat-datepicker #dpDropoff></mat-datepicker>
+                    <mat-error *ngIf="form.controls.dropoffDate.hasError('required')">Drop off date is
+                      required</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-12">
+                  <mat-form-field>
+                    <mat-label>Number Of Passengers</mat-label>
+                    <mat-select formControlName="numberOfPassengers">
+                      <mat-option *ngFor="let item of [1,2,3,4,5,6,7,8,9]" [value]="item">
+                        {{item}}
+                      </mat-option>
+                      <mat-option [value]="10">
+                        10+
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </ng-container>
+            <div *ngIf="!isHostPay" class="row mb-2">
+              <div *ngIf="requireLicensePlate" [ngClass]="requireLastName ? 'col-6' : 'col-12'">
+                <mat-form-field>
+                  <mat-label>Rental License Plate</mat-label>
+                  <input matInput type="text" formControlName="customerLicensePlate">
+                  <mat-error *ngIf="form.controls.customerLicensePlate.hasError('required')">Rental license plate is
+                    required</mat-error>
+                </mat-form-field>
+              </div>
+              <div *ngIf="requireLastName" [ngClass]="requireLicensePlate ? 'col-6' : 'col-12'">
+                <mat-form-field>
+                  <mat-label>Last Name</mat-label>
+                  <input matInput type="text" formControlName="customerLastName">
+                  <mat-error *ngIf="form.controls.customerLastName.hasError('required')">Last name is
+                    required</mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <mat-form-field *ngIf="isHostPay">
+              <mat-label>Guest Name</mat-label>
+              <input matInput type="text" formControlName="guestName">
+              <mat-error *ngIf="form.controls.guestName.hasError('required')">Guest name is
+                required</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Reservation ID</mat-label>
+              <input matInput type="text" formControlName="reservationId">
+              <mat-error *ngIf="form.controls.reservationId.hasError('required')">Reservation ID is
+                required</mat-error>
+            </mat-form-field>
+            <ng-container *ngIf="!isHostPay">
+              <mat-form-field class="mb-2">
+                <mat-label>Card Number <small>(ex: XXXX XXXX XXXX XXXX)</small></mat-label>
+                <input matInput type="text" formControlName="cardNumber" mask="9999 9999 9999 9999 99">
+                <img [src]="cardIcon" matSuffix />
+                <mat-error *ngIf="form.controls.cardNumber.hasError('required')">Card number is required</mat-error>
+                <mat-error
+                  *ngIf="!form.controls.cardNumber.hasError('required') && form.controls.cardNumber.invalid">Card
+                  number is not valid</mat-error>
+              </mat-form-field>
+              <div class="row mb-2">
+                <div class="col-6">
+                  <mat-form-field MMYY>
+                    <mat-label>Expiration</mat-label>
+                    <input matInput [matDatepicker]="dp" formControlName="expirationDate" [readonly]="true" [min]="min"
+                      (click)="dp.open()">
+                    <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                    <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
+                    </mat-datepicker>
+                    <mat-error *ngIf="form.controls.expirationDate.hasError('required')">Expiration is
+                      required</mat-error>
+                    <mat-error
+                      *ngIf="!form.controls.expirationDate.hasError('required') && form.controls.expirationDate.invalid">Expiration
+                      date is not valid</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field>
+                    <mat-label>CVV</mat-label>
+                    <input matInput type="text" formControlName="cardCode" mask="9999">
+                    <mat-error *ngIf="form.controls.cardCode.hasError('required')">Security code is required</mat-error>
+                    <mat-error
+                      *ngIf="!form.controls.cardCode.hasError('required') && form.controls.cardCode.invalid">Security
+                      code is not valid</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+            </ng-container>
+            <div class="text-right">
+              <button class="btn btn-success btn-block" type="submit" [disabled]="form.invalid || loading">
+                Pay
+                <span *ngIf="loading" class="spinner-border spinner-border-sm float-right" role="status"
+                  aria-hidden="true"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <img [src]="logo" height="48" />
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <div class="font-weight-bold">Bill To</div>
+          <div *ngIf="!isHostPay">{{ invoiceDetail?.referenceName }}</div>
+          <div *ngIf="isHostPay">
+            <div>{{ invoiceDetail?.billedToAddress?.address1 }} {{ invoiceDetail?.billedToAddress?.address2 }}</div>
+            <div>{{ invoiceDetail?.billedToAddress?.city }}, {{ invoiceDetail?.billedToAddress?.state }} {{
+              invoiceDetail?.billedToAddress?.zip }}</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div *ngIf="(isHostPay && status === 'paid') || !isHostPay" class="row">
+            <div class="col-md-6 text-right pr-0 font-weight-normal mb-1">Receipt Number:</div>
+            <div class="col-md-6">{{ invoiceDetail?.invoiceNumber }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0 font-weight-normal mb-1">Status:</div>
+            <div class="col-md-6">{{ status | titlecase }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0 font-weight-normal mb-1">Payment Attempts:</div>
+            <div class="col-md-6">{{ invoiceDetail?.tries }} of {{ invoiceDetail?.maxTries }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Pick Up Date:</div>
+            <div class="col-md-6">{{ pickUpDate | date: 'MM/dd/yyyy hh:mm a' }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Drop Off Date:</div>
+            <div class="col-md-6">{{ dropOffDate | date: 'MM/dd/yyyy hh:mm a' }}</div>
+          </div>
+          <div *ngIf="numberOfPassengers" class="row">
+            <div class="col-md-6 text-right pr-0">Number Of Passengers:</div>
+            <div class="col-md-6">{{ numberOfPassengers }}</div>
+          </div>
+        </div>
+        <div class="col-md-6 offset-md-6">
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Receipt Date:</div>
+            <div class="col-md-6">{{ invoiceDetail?.invoiceDate | date: 'MM/dd/yyyy hh:mm a' }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Payment Date:</div>
+            <div class="col-md-6">{{ invoiceDetail?.paymentDate | date: 'MM/dd/yyyy hh:mm a' }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">CC Number:</div>
+            <div class="col-md-6">{{ invoiceDetail?.paymentMethod }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Amount Paid:</div>
+            <div class="col-md-6">{{ invoiceDetail?.totalPaid | currency: 'USD' }}</div>
+          </div>
+          <div *ngIf="isHostPay && guestName" class="row">
+            <div class="col-md-6 text-right pr-0">Guest Name:</div>
+            <div class="col-md-6">{{ guestName }}</div>
+          </div>
+          <div *ngIf="reservationId" class="row">
+            <div class="col-md-6 text-right pr-0">Reservation ID:</div>
+            <div class="col-md-6">{{ reservationId }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive mt-4">
+        <table class="table">
+          <thead class="text-primary">
+            <tr>
+              <th>Description</th>
+              <th style="width: 15%">Quantity</th>
+              <th style="width: 15%">Amount</th>
+              <th style="width: 15%">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of invoiceDetail?.products">
+              <td>{{ product.description }}</td>
+              <td>{{ product.quantity | number }}</td>
+              <td>{{ product.rate | currency: 'USD' }}</td>
+              <td>{{ product.amount | currency: 'USD' }}</td>
+            </tr>
+            <tr>
+              <td [colSpan]="3" class="text-right font-weight-bold pr-5">Total</td>
+              <td class="font-weight-bold">{{ invoiceDetail?.totalAmount | currency: 'USD' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="row justify-content-end">
+        <div class="col-md-auto">
+          <p class="font-weight-bold">Thank you!</p>
+          <p>Payment required for vehicle exit</p>
+          <p>If you have any issues contact at<br /><a [href]="'mailto:' + invoiceDetail?.supportEmail">{{
+              invoiceDetail?.supportEmail }}</a></p>
+        </div>
+      </div>
+
+      <div *ngIf="invoiceDetail?.refunds.length > 0" class="table-responsive mt-4">
+        <h4 class="font-weight-bold">Refunds</h4>
+        <table class="table">
+          <thead class="text-primary">
+            <tr>
+              <th style="width: 20%">Date</th>
+              <th style="width: 20%">Amount</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let refund of invoiceDetail?.refunds">
+              <ng-container *ngIf="refund.isRefunded || refund.isVoided">
+                <td>{{ refund.created | date }}</td>
+                <td>{{ refund.amount | currency: 'USD' }}</td>
+                <td>{{ refund.reason }}</td>
+              </ng-container>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h4 class="font-weight-bold">{{ title }}</h4>
+        <p>{{ invoiceDetail?.companyAddress.address1 }} {{ invoiceDetail?.companyAddress.address2 }}<br />{{
+          invoiceDetail?.companyAddress.city }}, {{ invoiceDetail?.companyAddress.state }} {{
+          invoiceDetail?.companyAddress.zip }}</p>
+        <p></p>
+      </div>
+    </div>
+  </div>
+</div> -->

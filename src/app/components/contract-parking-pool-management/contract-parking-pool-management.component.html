@@ -1,0 +1,578 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">Pool Management</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4" >
+                <div class="row align-items-center">
+                  <div class="col-md">
+                    <h4 class="mb-0">Pools</h4>
+                  </div>
+                  <div class="col-md-auto">
+                    <button *ngIf="user?.turoUserType === 'backoffice'" mat-raised-button class="btn btn-info"
+                      data-toggle="modal" [attr.data-target]="'#' + poolModalId">
+                      <i class="material-icons">add</i> Add
+                    </button>
+                  </div>
+                </div>
+                <div id="marketAccordion" role="tablist">
+                  <div *ngFor="let fm of facilityMarkets; first as isFirstMarket" class="card-collapse">
+                    <div class="card-header" role="tab" [id]="'marketHeading' + fm.market.id"
+                      (click)="changeFacility(fm.facilities[0], fm)">
+                      <h5 class="mb-0">
+                        <a data-toggle="collapse" [href]="'#marketCollapse' + fm.market.id"
+                          [attr.aria-expanded]="isFirstMarket" [attr.aria-controls]="'marketCollapse' + fm.market.id"
+                          [ngClass]="{'collapsed': isFirstMarket}">
+                          {{fm.market.name}}
+                          <i class="material-icons">keyboard_arrow_down</i>
+                        </a>
+                      </h5>
+                    </div>
+                    <div [id]="'marketCollapse' + fm.market.id" class="collapse" [ngClass]="{show: isFirstMarket}"
+                      role="tabpanel" [attr.aria-labelledby]="'marketHeading' + fm.market.id"
+                      data-parent="#marketAccordion">
+                      <div class="card-body pr-0">
+                        <div [id]="'facilityAccordion' + fm.market.id" role="tablist">
+                          <div *ngFor="let facility of fm.facilities; first as isFirstFacility" class="card-collapse">
+                            <div class="card-header" role="tab" [id]="'facilityHeading' + facility.id"
+                              (click)="changeFacility(facility, fm)">
+                              <h5 class="mb-0">
+                                <a data-toggle="collapse" [href]="'#facilityCollapse' + facility.id"
+                                  [attr.aria-expanded]="isFirstFacility"
+                                  [attr.aria-controls]="'facilityCollapse' + facility.id" class="collapsed">
+                                  {{facility.name}}
+                                  <i class="material-icons">keyboard_arrow_down</i>
+                                </a>
+                              </h5>
+                            </div>
+                            <div [id]="'facilityCollapse' + facility.id" class="collapse"
+                              [ngClass]="{show: isFirstFacility}" role="tabpanel"
+                              [attr.aria-labelledby]="'facilityHeading' + facility.id"
+                              [attr.data-parent]="'#facilityAccordion' + fm.market.id">
+                              <div class="card-body pl-0">
+                                <div *ngFor="let pool of pools">
+                                  <button mat-raised-button class="btn btn-link btn-sm"
+                                    [ngClass]="pool.id === selectedPool?.id ? 'btn-warning' : 'btn-primary'"
+                                    style="text-transform: none;" (click)="changePool(pool)">
+                                    {{pool.name}}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="selectedPool" class="col-md-8">
+                <ul class="nav nav-pills nav-pills-warning" role="tablist">
+                  <li *ngFor="let tab of tabs; first as isFirst" class="nav-item">
+                    <a class="nav-link" [ngClass]="{'active': isFirst}" data-toggle="tab" [href]="'#' + tab.id"
+                      role="tablist">
+                      {{tab.name}}
+                    </a>
+                  </li>
+                </ul>
+
+                <div class="tab-content tab-space">
+                  <div class="mb-3">
+                    <span class="text-info font-weight-normal pr-2">{{selectedMarket?.name}}</span>/<span
+                      class="text-info font-weight-normal px-2">{{selectedFacility?.name}}</span>/<span
+                      class="text-info font-weight-normal pl-2">{{selectedPool?.name}}</span>
+                  </div>
+                  <div *ngIf="user?.turoUserType === 'backoffice'" class="tab-pane"
+                    [ngClass]="{active: user?.turoUserType === 'backoffice'}" id="configuration">
+                    <h4 class="mb-3">Basic Information</h4>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-4 text-left">
+                            <label>Name: </label>
+                          </div>
+                          <div class="col-md-8 font-weight-bold">
+                            {{selectedPool.name}}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-4 text-left">
+                            <label>Market: </label>
+                          </div>
+                          <div class="col-md-8 font-weight-bold">
+                            {{selectedPool.marketName}}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-4 text-left">
+                            <label>Facility: </label>
+                          </div>
+                          <div class="col-md-8 font-weight-bold text-left">
+                            {{selectedPool.facilityName}}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-4 text-left">
+                            <label>Payment Method: </label>
+                          </div>
+                          <div class="col-md-8 font-weight-bold text-left">
+                            {{selectedPool.isPaidByCard ? 'Credit Card' : 'Invoice'}}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <div class="row">
+                          <div class="col-md-3 text-left">
+                            <label>Status: </label>
+                          </div>
+                          <div class="col-md-9 font-weight-bold text-left">
+                            <mat-radio-group [(ngModel)]="status">
+                              <mat-radio-button [value]="'enabled'">Enabled</mat-radio-button>
+                              <mat-radio-button class="mr-1 me-3" style="padding-left: 10px;"
+                                [value]="'suspended'">Suspended</mat-radio-button>
+                              <mat-radio-button style="padding-left: 10px;"
+                                [value]="'disabled'">Disabled</mat-radio-button>
+                            </mat-radio-group>
+
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <hr />
+
+                    <h4 class="mb-4">Billing Contact</h4>
+                    <div class="row g-4">
+                      <!-- First Name -->
+                      <div class="col-md-6">
+                        <mat-form-field appearance="fill" class="w-100">
+                          <mat-label>First Name</mat-label>
+                          <input matInput [(ngModel)]="selectedPool.billingContact.firstname"
+                            [disabled]="selectedPool?.status !== 'enabled'">
+                        </mat-form-field>
+                      </div>
+
+                      <!-- Last Name -->
+                      <div class="col-md-6">
+                        <mat-form-field appearance="fill" class="w-100">
+                          <mat-label>Last Name</mat-label>
+                          <input matInput [(ngModel)]="selectedPool.billingContact.lastname"
+                            [disabled]="selectedPool?.status !== 'enabled'">
+                        </mat-form-field>
+                      </div>
+
+                      <!-- Email -->
+                      <div class="col-md-6">
+                        <mat-form-field appearance="fill" class="w-100">
+                          <mat-label>Email</mat-label>
+                          <input matInput type="email" [(ngModel)]="selectedPool.billingContact.email"
+                            [disabled]="selectedPool?.status !== 'enabled'">
+                        </mat-form-field>
+                      </div>
+
+                      <!-- Phone -->
+                      <div class="col-md-6">
+                        <mat-form-field appearance="fill" class="w-100">
+                          <mat-label>Phone</mat-label>
+                          <input matInput type="tel" [(ngModel)]="selectedPool.billingContact.phoneNumber"
+                            [disabled]="selectedPool?.status !== 'enabled'">
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+                    <hr />
+                    <h4 class="mb-0">Pricing</h4>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="row">
+                          <label class="col-md-4 col-6 col-form-label">Monthly Rate: </label>
+                          <div class="col-md-8 col-6">
+                            <mat-form-field>
+                              <span matPrefix class="mr-2">$</span>
+                              <input [(ngModel)]="selectedPool.monthlyRate" matInput type="number"
+                                [disabled]="selectedPool?.status !== 'enabled'">
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="row">
+                          <label class="col-md-4 col-6 col-form-label">Credential Fee: </label>
+                          <div class="col-md-8 col-6">
+                            <mat-form-field>
+                              <span matPrefix class="mr-2">$</span>
+                              <input [(ngModel)]="selectedPool.credentialFee" matInput type="number"
+                                [disabled]="selectedPool?.status !== 'enabled'">
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <button mat-raised-button class="btn btn-success pull-right" (click)="savePool(selectedPool)">
+                      Save
+                    </button>
+                  </div>
+                  <div class="tab-pane" [ngClass]="{active: user?.turoUserType !== 'backoffice'}" id="parkers">
+                    <div class="row align-items-center mb-3">
+                      <div class="col-md">
+                        <h4 class="mb-0">Parkers</h4>
+                      </div>
+                      <div class="col-md-auto">
+                        <button mat-raised-button class="btn btn-info" data-toggle="modal"
+                          [attr.data-target]="'#' + poolParkerModalId">
+                          <i class="material-icons">add</i> Add
+                        </button>
+                      </div>
+                    </div>
+                    <div id="poolGroupAccordion" role="tablist">
+                      <div *ngFor="let group of groups; first as isFirstGroup" class="card-collapse">
+                        <div class="card-header" role="tab" [id]="'poolGroupHeading' + group.id">
+                          <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" [href]="'#poolGroupCollapse' + group.id"
+                              [attr.aria-expanded]="isFirstGroup" [attr.aria-controls]="'poolGroupCollapse' + group.id"
+                              [ngClass]="{'collapsed': isFirstGroup}">
+                              {{group.name | titlecase}}
+                              <i class="material-icons">keyboard_arrow_down</i>
+                            </a>
+                          </h5>
+                        </div>
+                        <div [id]="'poolGroupCollapse' + group.id" class="collapse" [ngClass]="{'show': isFirstGroup}"
+                          role="tabpanel" [attr.aria-labelledby]="'poolGroupHeading' + group.id"
+                          data-parent="#poolGroupAccordion">
+                          <div class="card-body">
+                            <div class="table-responsive">
+                              <table class="table">
+                                <thead class="text-primary">
+                                  <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Status</th>
+                                    <th>Last Used</th>
+                                    <th>Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr *ngFor="let parker of parkers?.[group.id]">
+                                    <td>{{parker.name}}</td>
+                                    <td>{{parker.email}}</td>
+                                    <td>{{parker.phone}}</td>
+                                    <td>{{parker.isActive ? 'Active' : 'Inactive'}}</td>
+                                    <td>{{parker.modified | date: 'MM/dd/yyyy hh:mm:ss a'}}</td>
+                                    <td class="td-actions">
+                                      <button mat-raised-button type="button" class="btn btn-success mx-1"
+                                        (click)="editParker(parker)">
+                                        <i class="material-icons">edit</i>
+                                      </button>
+                                    </td>
+                                  </tr>
+                                  <tr *ngIf="parkers?.[group.id].length === 0">
+                                    <td [colSpan]="6" class="text-center">No Parkers</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="user?.roles[0].roleName === 'admin'" class="tab-pane" id="users">
+                    <div class="row align-items-center mb-3">
+                      <div class="col-md">
+                        <h4 class="mb-0">Users</h4>
+                      </div>
+                      <div class="col-md-auto">
+                        <button mat-raised-button class="btn btn-info" data-toggle="modal"
+                          [attr.data-target]="'#' + poolAdminModalId">
+                          <i class="material-icons">add</i> Add
+                        </button>
+                      </div>
+                    </div>
+                    <div class="table-responsive">
+                      <table class="table">
+                        <thead class="text-primary">
+                          <tr>
+                            <th>Name</th>
+                            <th>Groups</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let admin of selectedPool.administratorResponse">
+                            <td>{{admin.name}}</td>
+                            <td>{{admin.groupNames}}</td>
+                            <td>{{admin.email}}</td>
+                            <td>{{admin.phone}}</td>
+                            <td class="td-actions">
+                              <button mat-raised-button type="button" class="btn btn-danger mx-1"
+                                (click)="removeAdmin(admin)">
+                                <i class="material-icons">close</i>
+                              </button>
+                            </td>
+                          </tr>
+                          <tr *ngIf="selectedPool.administratorResponse.length === 0">
+                            <td [colSpan]="5" class="text-center">No Administrator</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!selectedPool" class="col-md-8">
+                <div class="alert alert-light border text-center py-5">
+                  <h5 class="mb-2 text-secondary">No Pool Selected</h5>
+                  <p class="mb-0">Please select a pool from the list to view its details.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" [id]="poolModalId" tabindex="-1" role="dialog" [attr.aria-labelledby]="poolModalId + 'Label'"
+  aria-hidden="true">
+  <form [formGroup]="poolForm" (submit)="savePool()" class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">New Pool</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h5>Basic Information</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <mat-form-field>
+              <mat-select formControlName="marketId" placeholder="Select Market">
+                <mat-option *ngFor="let fm of facilityMarkets" [value]="fm.market.id">
+                  {{fm.market.name}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <mat-select formControlName="facilityId" placeholder="Select Facility">
+                <mat-option *ngFor="let facility of marketFacilities" [value]="facility.id">
+                  {{facility.name}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="name" matInput type="text" placeholder="Pool Name">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <label>Payment Method</label>
+            <div>
+              <mat-radio-group formControlName="isPaidByCard">
+                <mat-radio-button class="mr-1" [value]="false">Invoice</mat-radio-button>
+                <mat-radio-button [value]="true">Credit Card on File</mat-radio-button>
+              </mat-radio-group>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <mat-form-field appearance="fill">
+              <mat-chip-list #chipList aria-label="Groups">
+                <mat-chip *ngFor="let group of poolForm.value.groups" (removed)="removePoolGroup(group)">
+                  {{group.name}}
+                  <button matChipRemove>
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip>
+                <input placeholder="New group..." [matChipInputFor]="chipList"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                  (matChipInputTokenEnd)="addPoolGroup($event)">
+              </mat-chip-list>
+            </mat-form-field>
+          </div>
+        </div>
+        <hr />
+        <h5>Billing Contract</h5>
+        <div formGroupName="billingContact" class="row">
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="firstname" matInput type="text" placeholder="First Name">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="lastname" matInput type="text" placeholder="Last Name">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="email" matInput type="email" placeholder="Email">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="phoneNumber" matInput type="tel" placeholder="Phone">
+            </mat-form-field>
+          </div>
+        </div>
+        <hr />
+        <h5>Pricing</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="monthlyRate" matInput type="number" placeholder="Monthly Rate">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="credentialFee" matInput type="number" placeholder="Credential Fee">
+            </mat-form-field>
+          </div>
+        </div>
+        <hr />
+        <h5>Initial Administrator</h5>
+        <div formGroupName="initialAdministrator" class="row">
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="firstname" matInput type="text" placeholder="First Name">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="lastname" matInput type="text" placeholder="Last Name">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="email" matInput type="email" placeholder="Email">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="phoneNumber" matInput type="tel" placeholder="Phone">
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Close</button>
+        <button [disabled]="poolForm.invalid" mat-raised-button type="submit" class="btn btn-success">Save</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal fade" [id]="poolParkerModalId" tabindex="-1" role="dialog"
+  [attr.aria-labelledby]="poolParkerModalId + 'Label'" aria-hidden="true">
+  <form [formGroup]="poolParkerForm" (submit)="saveParker()" class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Pool Parker</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <mat-form-field>
+          <input formControlName="name" matInput type="text" placeholder="Parker Name">
+        </mat-form-field>
+        <mat-form-field>
+          <input formControlName="email" matInput type="email" placeholder="Parker Email">
+        </mat-form-field>
+        <mat-form-field>
+          <input formControlName="phone" matInput type="tel" placeholder="Parker Phone">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="poolGroupId" placeholder="Select Group">
+            <mat-option *ngFor="let group of selectedPool?.groups" [value]="group.id">
+              {{group.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-checkbox formControlName="isActive">Is Active?</mat-checkbox>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Close</button>
+        <button [disabled]="poolParkerForm.invalid" mat-raised-button type="submit"
+          class="btn btn-success">Save</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal fade" [id]="poolAdminModalId" tabindex="-1" role="dialog"
+  [attr.aria-labelledby]="poolAdminModalId + 'Label'" aria-hidden="true">
+  <form [formGroup]="poolAdminForm" (submit)="saveAdmin()" class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Pool Administrator</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div formGroupName="user" class="row">
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="firstname" matInput type="text" placeholder="First Name">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="lastname" matInput type="text" placeholder="Last Name">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="email" matInput type="email" placeholder="Email">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input formControlName="phoneNumber" matInput type="tel" placeholder="Phone">
+            </mat-form-field>
+          </div>
+        </div>
+        <mat-form-field>
+          <mat-select formControlName="groups" placeholder="Select Group" [multiple]="true">
+            <mat-option *ngFor="let group of selectedPool?.groups" [value]="group.id">
+              {{group.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="role" placeholder="Select Role">
+            <mat-option value="admin">
+              Admin
+            </mat-option>
+            <mat-option value="manager">
+              Manager
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Close</button>
+        <button [disabled]="poolAdminForm.invalid" mat-raised-button type="submit" class="btn btn-success">Save</button>
+      </div>
+    </div>
+  </form>
+</div>

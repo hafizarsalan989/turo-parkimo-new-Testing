@@ -1,0 +1,27 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">Denied Tags</h3>
+          </div>
+          <div class="card-body">
+            <div class="row justify-content-between">
+              <div class="col-md-3">
+                <app-daterange-picker [defaultRange]="defaultRange"
+                  (rangeChanged)="onRangeChanged($event)"></app-daterange-picker>
+              </div>
+              <div class="col-md-auto">
+                <button mat-raised-button type="button" class="btn btn-info" (click)="exportCsv()">
+                  Export CSV
+                </button>
+              </div>
+            </div>
+          </div>
+          <app-table [columnDefs]="columnDefs" [data]="tableData" [showSearch]="false"></app-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

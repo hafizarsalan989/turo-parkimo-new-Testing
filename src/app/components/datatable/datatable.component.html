@@ -1,0 +1,20 @@
+<!-- <div class="toolbar">
+  <ng-content select="[toolbar]"></ng-content>
+</div> -->
+
+<div class="material-datatables" id="myTable" >
+  <table
+    [id]="tableId"
+    class="table table-striped table-no-bordered table-hover w-100">
+    <thead>
+      <tr>
+        <th *ngFor="let colunm of columns">{{ colunm.title }}</th>
+      </tr>
+    </thead>
+    <tfoot *ngIf="false">
+      <tr>
+        <th *ngFor="let colunm of columns">{{ colunm.title }}</th>
+      </tr>
+    </tfoot>
+  </table>
+</div>

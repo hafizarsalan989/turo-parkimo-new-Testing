@@ -1,0 +1,131 @@
+<div class="row">
+  <div class="col-lg-4 col-sm-6">
+    <div class="card card-stats pb-4">
+      <div class="card-header card-header-success card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">attach_money</i>
+        </div>
+        <p class="card-category">Current Balance</p>
+        <h3 class="card-title">
+          <span class="font-weight-bold">{{ data?.currentBalance | currency }}</span>
+        </h3>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="user.turoUserType !== 'host'" class="col-lg-4 col-sm-6">
+    <div class="card card-stats pb-4">
+      <div class="card-header card-header-info card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">done</i>
+        </div>
+        <p class="card-category">Total Available for Withdrawl</p>
+        <h3 class="card-title">
+          <span class="font-weight-bold">{{ data?.totalWithdrawalAvailable | currency }}</span>
+        </h3>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="user.turoUserType !== 'host'" class="col-lg-4 col-sm-6">
+    <div class="card card-stats pb-4">
+      <div class="card-header card-header-primary card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">done_all</i>
+        </div>
+        <p class="card-category">Total Withdrawls</p>
+        <h3 class="card-title">
+          <span class="font-weight-bold">{{ data?.totalWithdrawals | currency }}</span>
+        </h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-table [columnDefs]="columnDefs" [data]="tableData">
+  <ng-container action>
+    <div class="text-right">
+      <button *ngIf="user.turoUserType !== 'host' && user.turoUserType !== 'backoffice'" mat-raised-button type="button"
+        class="btn btn-success mr-2" [disabled]="!data?.totalWithdrawalAvailable" (click)="onWithdraw()">
+        Request Withdrawl
+      </button>
+      <!-- <button *ngIf="user.turoUserType === 'host'" mat-raised-button type="button" class="btn btn-primary mr-2"
+        data-toggle="modal" data-target="#achInfoModal">
+        Edit ACH Info
+      </button> -->
+      <button mat-raised-button type="button" class="btn btn-info" (click)="onExport()">
+        Export
+      </button>
+    </div>
+  </ng-container>
+</app-table>
+
+<div class="modal fade" id="achInfoModal" tabindex="-1" role="dialog" aria-labelledby="achInfoModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <form [formGroup]="achForm" (submit)="saveAch()" class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">ACH Info</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <div class="form-group mt-0">
+          <label class="mb-0">ABA Number</label>
+          <mat-form-field>
+            <input formControlName="abaNumber" matInput type="text" />
+            <mat-error *ngIf="achForm.get('abaNumber').hasError('required')" class="ml-1">
+              ABA(Routing) Number is <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="achForm.get('abaNumber').hasError('pattern')" class="ml-1">
+              ABA(Routing) Number should be <strong>number</strong>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="form-group mt-0">
+          <label class="mb-0">Account Number</label>
+          <mat-form-field>
+            <input formControlName="accountNumber" matInput type="text" />
+            <mat-error *ngIf="achForm.get('accountNumber').hasError('required')" class="ml-1">
+              Account Number is <strong>required</strong>
+            </mat-error>
+            <mat-error *ngIf="achForm.get('accountNumber').hasError('pattern')" class="ml-1">
+              ABA(Routing) Number should be <strong>number</strong>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="form-group mt-0">
+          <label class="mb-0">Bank Name</label>
+          <mat-form-field>
+            <input formControlName="bankName" matInput type="text" />
+            <mat-error *ngIf="achForm.get('bankName').hasError('required')" class="ml-1">
+              Bank Name is <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="form-group mt-0">
+          <label class="mb-0">Account Owner Name</label>
+          <mat-form-field>
+            <input formControlName="accountOwnerName" matInput type="text" />
+            <mat-error *ngIf="achForm.get('accountOwnerName').hasError('required')" class="ml-1">
+              Account Owner Name Number is <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="form-group mt-0">
+          <label class="mb-0">Account Owner Phone</label>
+          <mat-form-field>
+            <input formControlName="accountOwnerPhone" matInput type="text" />
+            <mat-error *ngIf="achForm.get('accountOwnerPhone').hasError('required')" class="ml-1">
+              Account Owner Phone is <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Close</button>
+        <button [disabled]="achForm.invalid" mat-raised-button type="submit" class="btn btn-success">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

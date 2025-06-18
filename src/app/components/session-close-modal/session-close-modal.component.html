@@ -1,0 +1,33 @@
+<div class="modal fade" id="sessionCloseModal" tabindex="-1" role="dialog" aria-labelledby="sessionCloseModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <form [formGroup]="form" (submit)="request()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Request Session Close</h4>
+          <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <textarea formControlName="reason" class="form-control" rows="5" placeholder="Reason"></textarea>
+          <div class="mt-2">
+            <label>Please upload any evidence of the vehicle leaving or entering like a reservation for
+              the vehicle.</label>
+            <input type="file" id="evidence" name="evidence" accept="image/*,application/pdf"
+              (change)="onChangeFile($event)" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">
+            Cancel
+          </button>
+          <button mat-raised-button type="submit" class="btn btn-success"
+            [disabled]="loading || form.invalid || !this.file">
+            Send
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

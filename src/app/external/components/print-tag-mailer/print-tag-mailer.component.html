@@ -1,0 +1,47 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="row justify-content-around">
+              <div class="col-auto">
+                <h3 class="card-title text-center mt-3">Host: {{credential.company.companyName}}</h3>
+              </div>
+              <div class="col-auto">
+                <h3 class="card-title text-center mt-3">Mailing Priority: {{credential.company.mailingPreference | titlecase}}</h3>
+              </div>
+              <div class="col-auto">
+                <h3 class="card-title text-center mt-3">Date Requested: {{credential.oldestRequest | date}}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="card-body px-3">
+            <div *ngFor="let tag of credential.tags; index as i"
+              class="row align-items-center justify-content-center border-bottom border-dark border-2 pt-4 pb-3" [ngClass]="{'border-top': i === 0, 'page-break':  (i + 1) % 8 === 0}">
+              <div class="col-md-6 left-side">
+                <div class="row">
+                  <div class="col-md-5 text-right pr-0">
+                    Type:
+                  </div>
+                  <div class="col-md-7">{{tag.tagType}}</div>
+                </div>
+                <div class="row">
+                  <div class="col-md-5 text-right pr-0">
+                    Tag Number:
+                  </div>
+                  <div class="col-md-7">{{tag.tag}}</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h2 class="text-center font-weight-bold">
+                  Tag<br />{{tag.tag}}
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

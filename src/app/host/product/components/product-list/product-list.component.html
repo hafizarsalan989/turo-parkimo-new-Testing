@@ -1,0 +1,95 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header mt-3">
+            <h3 class="card-title text-center mt-0">Products/Marketplace/Pricing</h3>
+          </div>
+          <div class="card-body">
+            <div id="facility-accordion" role="tablist">
+              <div *ngFor="let facility of facilities" class="card-collapse">
+                <div class="card-header" role="tab" [id]="'h_' + facility.id">
+                  <h5 class="mb-0">
+                    <a data-toggle="collapse" [href]="'#c_' + facility.id" aria-expanded="false"
+                      [attr.aria-controls]="'c_' + facility.id" class="collapsed font-weight-bold text-warning">
+                      {{facility.name}}
+                      <i class="material-icons">keyboard_arrow_down</i>
+                    </a>
+                  </h5>
+                </div>
+                <div [id]="'c_' + facility.id" class="collapse" role="tabpanel"
+                  [attr.aria-labelledby]="'h_' + facility.id" data-parent="#facility-accordion">
+                  <div class="card-body">
+                    <div class="row justify-content-between">
+                      <div class="col-md-auto">
+                        <h4 class="font-weight-bold">{{facility.name}}</h4>
+                        <p>{{facility.address.address1}} {{facility.address.address2}}<br />{{facility.address.city}},
+                          {{facility.address.state}} {{facility.address.zip}}</p>
+                        <p>Map it <a
+                            [href]="'https://maps.google.com/?q=' + facility.coordinate.coordinates[1] + ',' + facility.coordinate.coordinates[0]"
+                            target="_blank" class="text-danger"><b>Here</b></a></p>
+                      </div>
+                      <div class="col-md-auto">
+                        <img [src]="facility.imageUrl" class="rounded" width="200px" (click)="openImgViewer(facility)"
+                          title="Click to see large image" role="button" />
+                      </div>
+                    </div>
+
+                    <div class="mt-4">
+                      <h5 class="font-weight-bold text-warning">Products</h5>
+                      <div *ngFor="let product of facility.products" class="border rounded mb-3 p-3">
+                        <p class="font-weight-bold">{{product.name}}</p>
+                        <p>{{product.description}}</p>
+                        <div *ngFor="let rate of product.rates" class="row">
+                          <div class="col-auto col-md-2 text-right font-weight-bold pr-0">
+                            {{rate.name}}:
+                          </div>
+                          <div class="col-auto">{{rate.rate | currency: 'USD'}}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mt-4">
+                      <h5 class="font-weight-bold text-warning">Marketplace</h5>
+                      <div class="row">
+                        <div *ngFor="let place of facility.marketPlace" class="col-md-6">
+                          <div class="border rounded mb-3 p-3">
+                            <div class="row justify-content-between mb-2">
+                              <div class="col-md-6">
+                                <p class="font-weight-bold">{{place.serviceType}}<br />{{place.provider}}</p>
+                              </div>
+                              <div class="col-md-auto text-center">
+                                <img [src]="place.providerLogoUrl" class="rounded" alt="Logo" width="100" />
+                              </div>
+                            </div>
+                            <p>{{place.description}}</p>
+                            <div class="row">
+                              <div class="col-md-auto">
+                                <i class="material-icons align-bottom mr-2">email</i>
+                                <a [href]="'mailto:' + place.contact.email"
+                                  class="text-info font-weight-bold">{{place.contact.email}}</a>
+                                <i class="material-icons align-bottom ml-3" [cdkCopyToClipboard]="place.contact.email" title="Copy email" role="button">content_copy</i>
+                              </div>
+                              <div class="col-md-auto">
+                                <i class="material-icons align-bottom mr-2">call</i>
+                                <a [href]="'tel:' + place.contact.phone"
+                                  class="text-info font-weight-bold">{{place.contact.phone}}</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-img-viewer [images]="previewImages" [show]="showPreview" (onClose)="showPreview = false"></app-img-viewer>

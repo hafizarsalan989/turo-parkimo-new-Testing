@@ -1,0 +1,16 @@
+<legend *ngIf="legend">{{ legend }}</legend>
+<div class="fileinput fileinput-new text-center" data-provides="fileinput">
+	<div class="fileinput-new thumbnail">
+		<img [src]="url? url : './assets/img/image_placeholder.jpg'" alt="..." />
+	</div>
+	<div class="fileinput-preview fileinput-exists thumbnail"></div>
+	<div *ngIf="editable">
+		<span class="btn btn-sm btn-info btn-round btn-file">
+			<span class="fileinput-new">{{ btnSelectTitle }}</span>
+			<span class="fileinput-exists">{{ btnChangeTitle }}</span>
+			<input type="file" accept="image/png, image/gif, image/jpeg" (change)="onChange($event)" />
+		</span>
+		<a class="btn btn-sm btn-danger btn-round fileinput-exists ml-2" data-dismiss="fileinput"
+			(click)="changed.emit('')">{{ btnRemoveTitle }}</a>
+	</div>
+</div>

@@ -1,0 +1,27 @@
+
+
+.custom-toggle-group {
+  height: 32px;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.host-toggle {
+  background-color: white;
+  color: #000;
+}
+
+.vehicle-toggle {
+ background-color: white;
+  color: #000;
+}
+
+.mat-button-toggle-checked.host-toggle {
+  background-color: #000; 
+    color: white;
+}
+
+.mat-button-toggle-checked.vehicle-toggle {
+  background-color: #000; 
+    color: white;
+}

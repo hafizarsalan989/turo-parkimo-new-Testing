@@ -1,0 +1,9 @@
+.information {
+  color: #000000;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+::ng-deep .cdk-overlay-pane {
+  z-index: 5001 !important; // ensure it's above mat-dialog
+}
+

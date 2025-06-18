@@ -1,0 +1,17 @@
+:host {
+  .read-only {
+    ::ng-deep .mat-form-field-underline {
+      display: none !important;
+    }
+  }
+
+  .card-footer {
+    @media (max-width: 576px) {
+      display: block;
+
+      input[type="button"] {
+        width: 100%;
+      }
+    }
+  }
+}

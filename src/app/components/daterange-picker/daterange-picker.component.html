@@ -1,0 +1,5 @@
+<mat-form-field appearance="fill" floatLabel="auto">
+  <mat-label>{{ label }}</mat-label>
+  <input matInput type="text" ngxDaterangepickerMd [(ngModel)]="range" [alwaysShowCalendars]="alwaysShowCalendars"
+    [ranges]="ranges" [minDate]="minDate" (datesUpdated)="datesUpdated($event)" />
+</mat-form-field>

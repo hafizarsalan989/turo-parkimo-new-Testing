@@ -1,0 +1,129 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title text-center mt-3">Host Management</h3>
+      </div>
+      <div class="card-body">
+
+        <!-- <div class="d-flex justify-content-between align-items-center mb-3">
+          <mat-button-toggle-group [(ngModel)]="searchMode" (change)="onModeChange()" name="searchMode"
+            class="custom-toggle-group" exclusive aria-label="Search Mode">
+            <mat-button-toggle value="host" class="host-toggle">Host</mat-button-toggle>
+            <mat-button-toggle value="vehicle" class="vehicle-toggle">Vehicle</mat-button-toggle>
+          </mat-button-toggle-group>
+         
+        </div>
+ -->
+
+        <form *ngIf="searchMode === 'host'" [formGroup]="form" (submit)="onSearch()">
+          <div class="row justify-content-between align-items-baseline">
+            <div class="col-md-9">
+              <div class="row align-items-baseline">
+                <div class="col-md-3">
+                  <!-- <mat-form-field>
+                    <mat-label>Search</mat-label>
+                    <input matInput formControlName="searchCriteria" />
+                  </mat-form-field> -->
+                </div>
+                <div class="col-md-3">
+                  <!-- <mat-form-field>
+                    <mat-label>Facility</mat-label>
+                    <mat-select formControlName="facilityId">
+                      <mat-option [value]="'all'">ALL</mat-option>
+                      <mat-option *ngFor="let facility of facilities" [value]="facility.id">
+                        {{ facility.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field> -->
+                </div>
+                <div class="col-md-auto">
+                  <!-- <button mat-raised-button type="submit" class="btn btn-success" [disabled]="form.invalid">
+                    Search
+                  </button> -->
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <mat-form-field>
+                <mat-label>Sort by</mat-label>
+                <mat-select formControlName="sort">
+                  <mat-option *ngFor="let opt of sortOptions" [value]="opt">
+                    {{ opt }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </form>
+
+
+        <form *ngIf="searchMode === 'vehicle'" [formGroup]="advancedForm" (submit)="onAdvancedSearch()">
+          <div class="row justify-content-between align-items-baseline">
+            <div class="col-md-9">
+              <div class="row align-items-baseline">
+                <div class="col-md-6">
+                  <!-- <mat-form-field appearance="fill" > -->
+                  <!-- <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
+
+                    <mat-label>Search by Tag ID / VIN / License Plate</mat-label>
+                    <input matInput type="text" formControlName="query" />
+                  </mat-form-field> -->
+                </div>
+                <div class="col-md-auto align-self-end" style="padding-bottom: 10px;">
+                  <!-- <button mat-raised-button class="btn btn-success" type="submit" [disabled]="advancedForm.invalid">
+                    Search
+                  </button> -->
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <mat-form-field>
+                <mat-label>Sort by</mat-label>
+                <mat-select formControlName="sort">
+                  <mat-option *ngFor="let opt of sortOptions" [value]="opt">
+                    {{ opt }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </form>
+
+        <!-- Result Section -->
+        <div *ngIf="sortedHosts.length > 0" class="row align-items-center mt-4">
+          <div class="col">
+            <h5 class="font-weight-bold">Top 100 Results</h5>
+          </div>
+          <div class="col-auto">
+            <button mat-raised-button type="button" class="btn btn-info" (click)="exportCsv()">
+              Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div *ngFor="let host of sortedHosts" class="col-md-4">
+            <div class="card mt-0">
+              <div class="card-body" (click)="view(host.companyId)">
+                <div class="row">
+                  <div class="col-4 font-weight-bold">Company Name: </div>
+                  <div class="col-8">{{ host.companyName }}</div>
+                </div>
+                <div class="row">
+                  <div class="col-4 font-weight-bold">Owner Name: </div>
+                  <div class="col-8">{{ host.ownerName }}</div>
+                </div>
+                <div class="row">
+                  <div class="col-4 font-weight-bold">Owner Email: </div>
+                  <div class="col-8">{{ host.ownerEmail }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

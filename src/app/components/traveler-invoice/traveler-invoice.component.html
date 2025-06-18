@@ -1,0 +1,666 @@
+<div class="row align-items-center">
+  <div class="col-md">
+    <ul class="nav nav-pills nav-pills-warning" role="tablist">
+      <li class="nav-item">
+        <a
+          class="nav-link active"
+          data-toggle="tab"
+          href="#paid"
+          role="tablist"
+          (click)="onToggle('paid')"
+        >
+          Paid
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-toggle="tab"
+          href="#other"
+          role="tablist"
+          (click)="onToggle('other')"
+        >
+          Other
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-toggle="tab"
+          href="#pending"
+          role="tablist"
+          (click)="onToggle('pending')"
+        >
+          Unpaid
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="col-md-auto">
+    <!-- <button
+      *ngIf="user.turoUserType === 'host'"
+      mat-raised-button
+      type="button"
+      class="btn btn-primary mr-2"
+      data-toggle="modal"
+      data-target="#withdrawStatusModal"
+    >
+      Withdraw Status
+    </button> -->
+    <button
+      mat-raised-button
+      type="button"
+      class="btn btn-success"
+      data-toggle="modal"
+      data-target="#quickLinkModal"
+    >
+      View Guest Pay
+    </button>
+    <!-- <button mat-raised-button type="button" class="btn btn-warning" (click)="payGuest()">Pay Guest Exit Fee</button> -->
+  </div>
+</div>
+
+<div class="tab-content tab-space">
+  <div class="tab-pane active" id="paid">
+    <app-table
+      [columnDefs]="columnDefs"
+      [data]="paids"
+      [matSortActive]="matSortActive"
+      [lazyLoad]="true"
+      [pageSizeOptions]="pageSizeOptions"
+      (reload)="getBillbacks($event)"
+    >
+      <ng-container *ngTemplateOutlet="header" action></ng-container>
+      <ng-template #tdActions let-row="row">
+        <div class="d-flex justify-content-end align-items-center">
+          <button
+            *ngIf="row.status === 'paid' && row.total !== row.totalRefund"
+            mat-raised-button
+            type="button"
+            class="btn btn-danger mx-1"
+            title="Refund"
+            (click)="onRefund(row)"
+          >
+            <i class="material-icons">currency_exchange</i>
+          </button>
+          <button
+            mat-raised-button
+            type="button"
+            class="btn btn-info mx-1"
+            title="View"
+            (click)="onView(row.id)"
+          >
+            <i class="material-icons">visibility</i>
+          </button>
+        </div>
+      </ng-template>
+    </app-table>
+  </div>
+  <div class="tab-pane" id="other">
+    <app-table
+      [columnDefs]="columnDefs"
+      [data]="others"
+      [matSortActive]="matSortActive"
+      [lazyLoad]="true"
+      (reload)="getBillbacks($event)"
+      [pageSizeOptions]="pageSizeOptions"
+    >
+      <ng-container *ngTemplateOutlet="header" action></ng-container>
+      <ng-template #tdActions let-row="row">
+        <button
+          mat-raised-button
+          type="button"
+          class="btn btn-info mx-1"
+          title="View"
+          (click)="onView(row.id)"
+        >
+          <i class="material-icons">visibility</i>
+        </button>
+      </ng-template>
+    </app-table>
+  </div>
+  <div class="tab-pane" id="pending">
+    <app-table
+      [columnDefs]="columnDefs"
+      [data]="pendings"
+      [matSortActive]="matSortActive"
+      [lazyLoad]="true"
+      [pageSizeOptions]="pageSizeOptions"
+      (reload)="getBillbacks($event)"
+    >
+      <ng-container *ngTemplateOutlet="header" action></ng-container>
+      <ng-template #tdActions let-row="row">
+        <button
+          mat-raised-button
+          type="button"
+          class="btn btn-danger mx-1"
+          title="Cancel"
+          (click)="onCancel(row.id)"
+        >
+          <i class="material-icons">cancel</i>
+        </button>
+        <button
+          mat-raised-button
+          type="button"
+          class="btn btn-info mx-1"
+          title="View"
+          (click)="onView(row.id)"
+        >
+          <i class="material-icons">visibility</i>
+        </button>
+        <button
+          mat-raised-button
+          type="button"
+          class="btn btn-success mx-1"
+          title="Copy"
+          (click)="onCopy(row.id)"
+        >
+          <i class="material-icons">content_copy</i>
+        </button>
+      </ng-template>
+    </app-table>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="payGuestExitFeeModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="payGuestExitFeeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Pay Guest Exit Fee</h4>
+        <button
+          mat-button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-hidden="true"
+        >
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <mat-form-field>
+          <mat-select
+            [(ngModel)]="selectedInvoice"
+            placeholder="Select Facility"
+          >
+            <mat-option *ngFor="let invoice of invoices" [value]="invoice">
+              {{ invoice.facilityName }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="modal-footer">
+        <button
+          mat-raised-button
+          type="button"
+          class="btn btn-danger mr-2"
+          data-dismiss="modal"
+        >
+          Close
+        </button>
+        <a
+          mat-raised-button
+          type="button"
+          class="btn btn-success"
+          [href]="getInvoiceUrl(selectedInvoice?.urlKey, true)"
+          target="_blank"
+          (click)="hidePayGuestExitFeeModal()"
+          >Pay</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="billbackRefundModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="billbackRefundModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form
+      [formGroup]="refundForm"
+      (submit)="saveRefund()"
+      class="modal-content"
+    >
+      <div class="modal-header">
+        <h4 class="modal-title">Refund</h4>
+        <button
+          mat-button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-hidden="true"
+        >
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <mat-form-field>
+          <mat-label>Reason</mat-label>
+          <textarea formControlName="reason" matInput rows="5"></textarea>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Amount</mat-label>
+          <input formControlName="amount" matInput type="number" />
+          <span matPrefix class="mr-2">$</span>
+        </mat-form-field>
+      </div>
+      <div class="modal-footer">
+        <button
+          mat-raised-button
+          type="button"
+          class="btn btn-danger mr-2"
+          data-dismiss="modal"
+        >
+          Cancel
+        </button>
+        <button
+          [disabled]="refundForm.invalid"
+          mat-raised-button
+          type="submit"
+          class="btn btn-success"
+        >
+          Process Refund
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="withdrawStatusModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="withdrawStatusModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Withdraw Status</h4>
+        <button
+          mat-button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-hidden="true"
+        >
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="text-primary">
+              <tr>
+                <th>Status</th>
+                <th>Amount</th>
+                <th>Date Requested</th>
+                <th>ABA</th>
+                <th>Account Number</th>
+                <th>Bank Name</th>
+                <th>Account Owner Name</th>
+                <th>Account Owner Phone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let withdraw of withdraws">
+                <td>{{ withdraw.status }}</td>
+                <td>{{ withdraw.amount | currency : "USD" }}</td>
+                <td>{{ withdraw.created | date : "MM/dd/yyyy" }}</td>
+                <td>{{ withdraw.abaNumber }}</td>
+                <td>{{ withdraw.accountNumber }}</td>
+                <td>{{ withdraw.bankName }}</td>
+                <td>{{ withdraw.accountOwnerName }}</td>
+                <td>{{ withdraw.accountOwnerPhone }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          mat-raised-button
+          type="button"
+          class="btn btn-danger"
+          data-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="quickLinkModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="quickLinkModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Guest Pay</h4>
+        <button
+          mat-button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-hidden="true"
+        >
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div #quickLinkModalContainer class="table-responsive">
+          <table class="table">
+            <thead class="text-primary">
+              <tr>
+                <th>Facility Name</th>
+                <th style="width: 130px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let invoice of invoices">
+                <td>{{ invoice.facilityName }}</td>
+                <td class="td-actions text-right">
+                  <a
+                    mat-raised-button
+                    type="button"
+                    class="btn btn-info mx-1"
+                    title="View"
+                    [href]="getInvoiceUrl(invoice.urlKey)"
+                    target="_blank"
+                  >
+                    <i class="material-icons">visibility</i>
+                  </a>
+                  <button
+                    mat-raised-button
+                    type="button"
+                    class="btn btn-success mx-1"
+                    title="Copy"
+                    [container]="quickLinkModalContainer"
+                    ngxClipboard
+                    [cbContent]="getInvoiceUrl(invoice.urlKey)"
+                  >
+                    <i class="material-icons">content_copy</i>
+                  </button>
+                  <!-- <a mat-raised-button type="button" class="btn btn-warning mx-1" title="Host Pay"
+                    [href]="getInvoiceUrl(invoice.urlKey, true)" target="_blank">
+                    <i class="material-icons">attach_money</i>
+                  </a> -->
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          *ngIf="user.turoUserType === 'host'"
+          mat-raised-button
+          type="button"
+          class="btn btn-info mr-2"
+          (click)="openManageQuickLinksModal()"
+        >
+          Manage Guest Pay
+        </button>
+        <button
+          mat-raised-button
+          type="button"
+          class="btn btn-danger"
+          data-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="manageQuickLinkModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="manageQuickLinkModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <form [formGroup]="invoiceForm" class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Manage Guest Pay</h4>
+        <button
+          mat-button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-hidden="true"
+        >
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div formArrayName="invoices">
+          <ng-container
+            *ngFor="let invoice of invoiceCtrls.controls; let i = index"
+          >
+            <div [formGroup]="invoice">
+              <div class="card">
+                <div class="card-header border-0 px-4 py-3">
+                  <h5 class="font-weight-bold mb-0">
+                    {{ invoice.get("facilityName").value }}
+                    <small
+                      *ngIf="
+                        invoice.value.prevIsEnabled && !invoice.value.isPending
+                      "
+                      class="ml-1"
+                    >
+                      (Guest Pay Link)
+                    </small>
+                  </h5>
+                  <div
+                    *ngIf="
+                      invoice.value.prevIsEnabled && !invoice.value.isPending
+                    "
+                  >
+                    <small
+                      ><i
+                        ngxClipboard
+                        [cbContent]="invoice.get('invoiceUrl').value"
+                        class="material-icons mr-1 text-info clipboard"
+                        title="Copy nvoice URL"
+                        >content_copy</i
+                      >URL: {{ invoice.get("invoiceUrl").value }}</small
+                    >
+                  </div>
+                  <hr class="mb-0" />
+                </div>
+                <div class="card-body">
+                  <h5 class="d-flex justify-content-center font-weight-bold">
+                    Guest Pay
+                  </h5>
+                  <mat-checkbox class="mr-2" formControlName="isEnabled"
+                    >Enabled</mat-checkbox
+                  >
+
+                  <div class="mt-3">
+                    <label>Facility Parking Exit Fee: </label>
+                    <span class="h4 ml-1">{{
+                      invoice.value.travelerInvoiceParkingFee | currency : "USD"
+                    }}</span>
+                  </div>
+
+                  <div class="mt-3">
+                    <label>Percent of fee to pass to Guest</label>
+                    <div class="d-flex align-items-center">
+                      <label class="mb-0"
+                        >{{
+                          (invoice.value
+                            ?.minimumTravelerInvoiceParkingFeePercent ??
+                            0) *
+                            100 | number : "1.0-0"
+                        }}%</label
+                      >
+                      <mat-slider
+                        formControlName="percentPassThrough"
+                        [min]="
+                          invoice.value.minimumTravelerInvoiceParkingFeePercent
+                        "
+                        [max]="1"
+                        [step]="0.000001"
+                        thumbLabel
+                        [displayWith]="formatPercent"
+                        class="flex-grow-1 mx-1"
+                      ></mat-slider>
+                      <label class="mb-0">100%</label>
+                    </div>
+                  </div>
+
+                  <div class="row align-items-center">
+                    <div class="col-md-auto">
+                      <label>Exit Fee Passing Through to Guest: </label>
+                    </div>
+                    <div class="col-md">
+                      <mat-form-field appearance="fill" floatLabel="auto">
+                        <span matPrefix>$</span>
+                        <input
+                          [value]="invoice.value.parkingFee"
+                          matInput
+                          type="number"
+                          [min]="invoice.value.minimumTravelerInvoiceParkingFee"
+                          [max]="invoice.value.travelerInvoiceParkingFee"
+                          (change)="onChangeParkingFee($event, invoice)"
+                        />
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <div formArrayName="tripCharges" class="mt-3">
+                    <label>Trip Fees: </label>
+                    <span
+                      *ngIf="invoice.get('tripCharges').controls.length === 0"
+                      class="h4 ml-1"
+                      >{{ 0 | currency : "USD" }}</span
+                    >
+                    <ng-container
+                      *ngFor="
+                        let tripCharge of invoice.get('tripCharges').controls;
+                        let j = index
+                      "
+                    >
+                      <div [formGroup]="tripCharge" class="ml-3 mt-1">
+                        <label>{{ tripCharge.value.name }}: </label>
+                        <span class="ml-1">{{
+                          tripCharge.value.amount | currency : "USD"
+                        }}</span>
+                      </div>
+                    </ng-container>
+                  </div>
+
+                  <div class="row align-items-center">
+                    <div class="col-md font-weight-bold">
+                      Total Guest Charged:
+                      <span class="h3 ml-1">{{
+                        totalCharge(invoice) | currency : "USD"
+                      }}</span>
+                    </div>
+                    <div class="col-md-auto">
+                      <a
+                        *ngIf="
+                          invoice.value.prevIsEnabled &&
+                          !invoice.value.isPending
+                        "
+                        mat-raised-button
+                        type="button"
+                        class="btn btn-warning btn-link mr-2"
+                        [href]="invoice.get('invoiceUrl').value"
+                        target="_blank"
+                      >
+                        Pay Guest Invoice
+                      </a>
+                      <button
+                        type="submit"
+                        mat-raised-button
+                        type="button"
+                        class="btn btn-info"
+                        [disabled]="invoice.invalid"
+                        (click)="onSave(invoice.value, i)"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          mat-raised-button
+          type="button"
+          class="btn btn-danger"
+          data-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<ng-template #header>
+  <div class="row justify-content-between align-items-baseline">
+    <div class="col-md-auto">
+      <mat-form-field>
+        <mat-date-range-input
+          [formGroup]="rangeForm"
+          [rangePicker]="picker"
+          [max]="today"
+        >
+          <input
+            matStartDate
+            formControlName="startDate"
+            readonly
+            (click)="picker.open()"
+          />
+          <input
+            matEndDate
+            formControlName="endDate"
+            readonly
+            (click)="picker.open()"
+          />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+
+        <mat-error *ngIf="rangeForm.controls.endDate.hasError('rangeOver')"
+          >Maxiumn range is 31 days</mat-error
+        >
+      </mat-form-field>
+    </div>
+    <div class="col-md-auto col-12">
+      <!-- <button *ngIf="user.turoUserType==='host'" mat-raised-button class="btn btn-info mr-2" type="button"
+        (click)="addBillBack()">
+        New Invoice
+      </button> -->
+    </div>
+  </div>
+</ng-template>

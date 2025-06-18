@@ -1,0 +1,18 @@
+::ng-deep {
+  .ng-image-fullscreen-view {
+    z-index: 999999999 !important;
+  }
+
+  .lightbox-wrapper {
+    background-color: white !important;
+  }
+
+  .caption {
+    background-color: white !important;
+    color: #1d2941 !important;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+  }
+}

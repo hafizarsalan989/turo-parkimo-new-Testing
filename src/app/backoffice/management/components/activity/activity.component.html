@@ -1,0 +1,288 @@
+<div class="main-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title text-center mt-3">Vehicle Activity</h3>
+                    </div>
+                    <div class="card-body">
+                        <app-table [columnDefs]="columnDefs" [data]="tableData" [showSearch]="false">
+                            <div class="row justify-content-end" action>
+                                <div class="col-md-auto">
+                                    <button type="button" mat-raised-button class="btn btn-info" data-toggle="modal"
+                                        data-target="#addNewActivity">
+                                        Add Activity
+                                    </button>
+                                </div>
+                            </div>
+                        </app-table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addNewActivity" tabindex="-1" role="dialog" aria-labelledby="addNewActivityModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">New Activity</h4>
+                <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <i class="material-icons">clear</i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row align-items-baseline">
+                    <div class="col-md-6">
+                        <mat-form-field>
+                            <mat-label>Filter by Tag/QR Code</mat-label>
+                            <input [(ngModel)]="searchCriteria" matInput placeholder="AVI Tag Number or QR Code">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-auto">
+                        <button mat-raised-button type="submit" class="btn btn-success mr-2"
+                            (click)="onSearch()">Search</button>
+                    </div>
+                </div>
+                <div *ngIf="hub" class="row">
+                    <div class="col-12 mb-4">
+                        <h4 class="mb-3">Information</h4>
+                        <div class="row">
+                            <ng-container *ngFor="let info of [
+        { label: 'Type', value: hub.codeType },
+        { label: 'Status', value: hub.status },
+        { label: 'Host', value: hub.company?.name },
+        { label: 'Facility', value: hub.facility?.name },
+        { label: 'Vehicle', value: hub.vehicle?.name },
+        { label: 'Subscription', value: hub.subscription ? 'Yes' : 'No' },
+        { label: 'Unlimited Pass', value: hub.unlimitedPass ? 'Yes' : 'No' }
+      ]">
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex">
+                                        <strong class="me-2" style="min-width: 120px;">{{ info.label }}:</strong>
+                                        <span>{{ info.value }}</span>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="mb-0">Activity (Last 3 sessions)</h4>
+                            <button mat-raised-button class="btn btn-success btn-sm" data-toggle="modal"
+                                data-target="#managementCreatingActivityModal">
+                                <i class="material-icons">add</i> Add
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Entry Kiosk</th>
+                                        <th>Entry Time</th>
+                                        <th>Exit Kiosk</th>
+                                        <th>Exit Time</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let session of hub.sessions">
+                                        <td>{{ session.entryKisok }}</td>
+                                        <td>{{ session.entryStamp | date: 'MM/dd/yyyy hh:mm a' }}</td>
+                                        <td>{{ session.exitKisok }}</td>
+                                        <td>{{ session.exitStamp | date: 'MM/dd/yyyy hh:mm a' }}</td>
+                                        <td>{{ session.status }}</td>
+                                        <td>
+                                            <button mat-raised-button type="button" class="btn btn-info btn-sm"
+                                                (click)="viewActivity(session)">
+                                                <i class="material-icons">visibility</i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="hub.sessions.length === 0">
+                                        <td colspan="6" class="text-center">No Parkers</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div *ngIf="hub" class="row">
+                    <div class="col-md-12">
+                        <h4>Information</h4>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-5 text-right">
+                                        <label>Type: </label>
+                                    </div>
+                                    <div class="col-md-auto">{{hub.codeType}}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-5 text-right">
+                                        <label>Status: </label>
+                                    </div>
+                                    <div class="col-md-auto">{{hub.status}}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-5 text-right">
+                                        <label>Host: </label>
+                                    </div>
+                                    <div class="col-md-auto">{{hub.company.name}}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-5 text-right">
+                                        <label>Facility: </label>
+                                    </div>
+                                    <div class="col-md-auto">{{hub.facility.name}}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-5 text-right">
+                                        <label>Vehicle: </label>
+                                    </div>
+                                    <div class="col-md-auto">{{hub.vehicle.name}}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-5 text-right">
+                                        <label>Subscription: </label>
+                                    </div>
+                                    <div class="col-md-auto">{{hub.subscription ? 'Yes' : 'No'}}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-5 text-right">
+                                        <label>Unlimited Pass: </label>
+                                    </div>
+                                    <div class="col-md-auto">{{hub.unlimitedPass ? 'Yes' : 'No'}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row align-items-center justify-content-between">
+                            <div class="col-auto">
+                                <h4>Activity(Last 3 sessions)</h4>
+                            </div>
+                            <div class="col-auto">
+                                <button mat-raised-button mat-min-fab class="btn btn-sm btn-success btn-round btn-fab"
+                                    data-toggle="modal" data-target="#managementCreatingActivityModal">
+                                    <i class="material-icons">add</i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead class="text-primary">
+                                    <tr>
+                                        <th>Entry Kisok</th>
+                                        <th>Entry Time</th>
+                                        <th>Exit Kisok</th>
+                                        <th>Exit Time</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let session of hub.sessions">
+                                        <td>{{session.entryKisok}}</td>
+                                        <td>{{session.entryStamp | date: 'MM/dd/yyyy hh:mm a'}}</td>
+                                        <td>{{session.exitKisok}}</td>
+                                        <td>{{session.exitStamp | date: 'MM/dd/yyyy hh:mm a'}}</td>
+                                        
+                                        <td>{{session.status}}</td>
+                                       
+                                        <td class="td-actions">
+                                            <button mat-raised-button type="button" class="btn btn-info mx-1"
+                                                (click)="viewActivity(session)">
+                                                <i class="material-icons">visibility</i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="hub.sessions.length === 0">
+                                        <td [colSpan]="5" class="text-center">No Parkers</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="managementCreatingActivityModal" tabindex="-1" role="dialog"
+    aria-labelledby="managementCreatingActivityModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div *ngIf="activityForm">
+            <form [formGroup]="activityForm" class="modal-content" (submit)="onSaveActivity()">
+                <div class="modal-header">
+                    <h4 class="modal-title">New Activity</h4>
+                    <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        <i class="material-icons">clear</i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <mat-form-field>
+                        <mat-label>Activity</mat-label>
+                        <mat-select formControlName="activity">
+                            <mat-option [value]="'entry'">
+                                Entry
+                            </mat-option>
+                            <mat-option [value]="'exit'">
+                                Exit
+                            </mat-option>
+                            <mat-option [value]="'reject'">
+                                Reject
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-checkbox formControlName="vendedGate">Vended Gate?</mat-checkbox>
+                    <mat-form-field>
+                        <mat-label>Car Park</mat-label>
+                        <mat-select formControlName="carParkId">
+                            <mat-option *ngFor="let carPark of carParks" [value]="carPark.id">
+                                {{carPark.name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Time</mat-label>
+                        <input matInput type="text" ngxDaterangepickerMd [alwaysShowCalendars]="true"
+                            [singleDatePicker]="true" [timePicker]="true" [timePicker24Hour]="false"
+                            [locale]="{ format: 'MM/DD/YYYY hh:mm A' }" formControlName="stamp" />
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Notes</mat-label>
+                        <textarea formControlName="notes" matInput rows="5"></textarea>
+                    </mat-form-field>
+                </div>
+                <div class="modal-footer">
+                    <button mat-raised-button type="button" class="btn btn-danger mr-2"
+                        data-dismiss="modal">Close</button>
+                    <button [disabled]="activityForm.invalid" mat-raised-button type="submit"
+                        class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<app-activity-list-modal [activities]="selectedSession?.activities"></app-activity-list-modal>

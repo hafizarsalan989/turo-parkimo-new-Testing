@@ -1,0 +1,5 @@
+<app-data-table [tableId]="tableId" [columnDefs]="columnDefs" [actions]="actions" [data]="sessions">
+</app-data-table>
+
+<app-activity-list-modal [activities]="selectedSession?.activities"></app-activity-list-modal>
+<app-session-close-modal [session]="selectedSession" (closed)="onClosedSession($event)"></app-session-close-modal>

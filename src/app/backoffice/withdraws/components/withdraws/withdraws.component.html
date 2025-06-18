@@ -1,0 +1,51 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">Withdraw Manager</h3>
+          </div>
+          <div class="card-body">
+            <app-table [columnDefs]="columnDefs" [data]="tableData">
+              <ng-template #tdActions let-row="row">
+                <button *ngIf="row.status === 'pending'" mat-raised-button type="button" class="btn btn-danger mx-1"
+                  title="Pay" (click)="saveStatus(row.id)">
+                  <i class="material-icons">paid</i>
+                </button>
+                <button *ngIf="row.status === 'pending'" mat-raised-button type="button" class="btn btn-info mx-1"
+                  title="Pay" (click)="openNoteModal(row.id)">
+                  <i class="material-icons">edit</i>
+                </button>
+              </ng-template>
+            </app-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="withdrawNotesModal" tabindex="-1" role="dialog" aria-labelledby="withdrawNotesModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Notes</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <mat-form-field appearance="fill" floatLabel="auto">
+          <mat-label>Notes</mat-label>
+          <textarea [formControl]="notes" matInput rows="3" placeholder="Enter here"></textarea>
+        </mat-form-field>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button class="btn btn-danger mr-2">Cancel</button>
+        <button mat-raised-button class="btn btn-success" [disabled]="notes.invalid" (click)="saveNotes()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,108 @@
+<div *ngIf="company?.referralCode" class="main-content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title text-center mt-3">Refer a Friend</h3>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-md-5">
+            <div class="card card-stats pb-4">
+              <div class="card-header card-header-success card-header-icon">
+                <div class="card-icon">
+                  <i class="material-icons">attach_money</i>
+                </div>
+                <p class="card-category">Total Earned</p>
+                <h3 class="card-title">
+                  <span class="font-weight-bold">{{ totalEarned | currency }}</span>
+                </h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-7">
+            <div class="mb-2">
+              <span><span class="font-weight-bold">Referral Link: </span>
+                <i ngxClipboard [cbContent]="referralUrl" class="material-icons ml-1 text-info clipboard"
+                  title="Copy referral URL">content_copy</i>
+                {{referralUrl}}
+              </span>
+            </div>
+
+            <!-- <div class="mb-2">
+              <a [href]="achUrl" class="text-info font-weight-bold">Go to ACH Settings</a>
+            </div> -->
+          </div>
+        </div>
+
+        <app-table [columnDefs]="columnDefs" [data]="tableData">
+          <ng-template #tdActions let-row="row">
+            <button mat-raised-button type="button" class="btn btn-info mx-1" title="View Activity"
+              (click)="viewActivity(row.id)">
+              <i class="material-icons">visibility</i>
+            </button>
+          </ng-template>
+        </app-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="termsOfReferralServiceModal" tabindex="-1" role="dialog"
+  aria-labelledby="termsOfReferralServiceModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Referral Policy</h4>
+      </div>
+      <div class="modal-body">
+        I have read and agree to the <a href="https://www.parkmycarshare.com/policies/tos-referral"
+          target="_blank">referral policy</a>.
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-success mr-2" [disabled]="isDisabledPolicy"
+          (click)="onAccept()">I Agree</button>
+        <button mat-raised-button type="button" class="btn btn-danger" (click)="onCancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="referralActivityModal" tabindex="-1" role="dialog"
+  aria-labelledby="referralActivityModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Referral Activity</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="text-primary">
+              <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Facility</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let activity of activities">
+                <td>{{ activity.invoiceDate | date: 'MM/dd/yyyy' }}</td>
+                <td>{{ activity.amount | currency: 'USD' }}</td>
+                <td>{{ activity.facilityName }}</td>
+              </tr>
+              <tr>
+                <td *ngIf="activities.length === 0" [colSpan]="3" class="text-center">No Data</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

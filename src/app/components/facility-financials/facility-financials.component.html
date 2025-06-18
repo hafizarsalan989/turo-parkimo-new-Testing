@@ -1,0 +1,32 @@
+<app-table [columnDefs]="columnDefs" [data]="tableData" [showSearch]="false" [showPagination]="false">
+  <div class="row" action>
+    <div class="col-md-3">
+      <mat-form-field>
+        <mat-label>Facility</mat-label>
+        <mat-select [(ngModel)]="facilityId" (ngModelChange)="getSummary()">
+          <mat-option *ngFor="let facility of facilities" [value]="facility.id">
+            {{ facility.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="col-md-3 d-flex align-items-baseline">
+      <button mat-raised-button mat-min-fab class="btn btn-ghost btn-sm btn-link btn-round btn-fab"
+        [disabled]="isDisabledPrev" (click)="onPrev()">
+        <i class="material-icons">arrow_back_ios</i>
+      </button>
+      <mat-form-field>
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="dp" [formControl]="date" [min]="min" [max]="max" [readonly]="true"
+          (click)="dp.open()">
+        <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
+        </mat-datepicker>
+      </mat-form-field>
+      <button mat-raised-button mat-min-fab class="btn btn-ghost btn-sm btn-link btn-round btn-fab"
+        [disabled]="isDisabledNext" (click)="onNext()">
+        <i class="material-icons">arrow_forward_ios</i>
+      </button>
+    </div>
+  </div>
+</app-table>

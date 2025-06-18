@@ -1,0 +1,74 @@
+<div class="main-content">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title text-center mt-3">Action Center</h3>
+					</div>
+					<div class="card-body">
+						<div class="row align-items-baseline">
+							<div class="col-md-auto">
+								<label class="text-dark">Filters: </label>
+							</div>
+							<div class="col-md-2">
+								<mat-form-field>
+									<mat-select [(ngModel)]="actionStatus" (ngModelChange)="filterData()" placeholder="Status">
+										<mat-option [value]="'open'">
+											Open
+										</mat-option>
+										<mat-option [value]="'closed'">
+											Closed
+										</mat-option>
+									</mat-select>
+								</mat-form-field>
+							</div>
+							<div class="col-md-2">
+								<mat-form-field>
+									<mat-select [(ngModel)]="actionType" (ngModelChange)="filterData()" placeholder="Type">
+										<mat-option [value]="'all'">
+											All
+										</mat-option>
+										<mat-option [value]="'HostOnboarding'">
+											Host Onboarding
+										</mat-option>
+										<mat-option [value]="'FineUnassignedTagDenied'">
+											Fine Unassigned Tag Denied
+										</mat-option>
+										<mat-option [value]="'FineParkingViolation'">
+											Fine Parking Violation
+										</mat-option>
+									</mat-select>
+								</mat-form-field>
+							</div>
+						</div>
+						<app-data-table [tableId]="tableId" [columnDefs]="columnDefs" [data]="filteredData" [pageLength]="50">
+						</app-data-table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<app-action-log-file [actionItemId]="selectedActionItem?.id" [isAttachment]="isAttachment"
+	(saved)="onSaveLogFile($event)"></app-action-log-file>
+
+<div class="modal fade" [id]="actionsModalId" tabindex="-1" role="dialog"
+	[attr.aria-labelledby]="actionsModalId + 'Label'" aria-hidden="true">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title"></h4>
+				<button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					<i class="material-icons">clear</i>
+				</button>
+			</div>
+			<div class="modal-body">
+				<button mat-raised-button class="btn btn-primary btn-block" (click)="onClickMenu('View')">View</button>
+				<button *ngFor="let item of selectedActionItem?.actionMenu" mat-raised-button class="btn btn-primary btn-block"
+					(click)="onClickMenu(item.id)">{{item.description}}</button>
+			</div>
+		</div>
+	</div>
+</div>

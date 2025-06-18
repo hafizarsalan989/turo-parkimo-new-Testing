@@ -1,0 +1,368 @@
+<!-- <div class="main-content">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<form [formGroup]="form" class="form-horizontal" (submit)="saveVehicle()">
+					<div class="card">
+						<div class="card-header">
+							<div class="row align-items-center mt-3">
+								<div class="col-md-4">
+									<button *ngIf="!editable" mat-raised-button class="btn btn-info btn-link px-0" type="button"
+										(click)="cancel()">
+										<i class="material-icons">arrow_back</i> Back
+									</button>
+								</div>
+								<div class="col-md-4">
+									<h3 class="card-title text-center mt-0"><span class="text-warning font-weight-bold mr-2">{{
+											form.value.name }}</span><small>(<b>Status: </b>{{form.value.status}})</small></h3>
+								</div>
+								<div class="col-md-4 text-right">
+									<button *ngIf="editable" mat-raised-button class="btn btn-danger mr-2" type="button"
+										(click)="cancel()">
+										Cancel
+									</button>
+									<button *ngIf="!editable" mat-raised-button class="btn btn-info" type="button"
+										(click)="editVehicle()">
+										Edit
+									</button>
+									<button *ngIf="editable" mat-raised-button class="btn btn-success" type="submit"
+										[disabled]="form.invalid">
+										Save changes
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="card-body">
+
+							<div class="row mt-4">
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Name</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field [ngClass]="{'read-only': !editable}">
+												<input formControlName="name" matInput type="text" [readonly]="!editable" />
+												<mat-error *ngIf="form.get('name').hasError('required')" class="ml-1">
+													Name is <strong>required</strong>
+												</mat-error>
+												<mat-error *ngIf="form.get('name').hasError('minlength')" class="ml-1">
+													Name should be greater than <strong>5 charactors</strong>
+												</mat-error>
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Plate</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field [ngClass]="{'read-only': !editable}">
+												<input formControlName="licensePlate" matInput type="text" [readonly]="!editable" />
+												<mat-error *ngIf="form.get('licensePlate').hasError('required')" class="ml-1">
+													Plate is <strong>required</strong>
+												</mat-error>
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Plate State</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field [ngClass]="{'read-only': !editable}">
+												<input *ngIf="!editable" formControlName="licensePlateState" matInput type="text"
+													[readonly]="!editable" />
+												<mat-select *ngIf="editable" formControlName="licensePlateState" [disabled]="!editable">
+													<mat-option *ngFor="let state of states" [value]="state.code">
+														{{ state.name }}
+													</mat-option>
+												</mat-select>
+												<mat-error *ngIf="form.get('licensePlateState').hasError('required')" class="ml-1">
+													Please select the state
+												</mat-error>
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Color</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field [ngClass]="{'read-only': !editable}">
+												<input *ngIf="!editable" formControlName="color" matInput type="text" [readonly]="!editable" />
+												<mat-select *ngIf="editable" formControlName="color" [disabled]="!editable">
+													<mat-option *ngFor="let color of colors" [value]="color">
+														{{ color }}
+													</mat-option>
+												</mat-select>
+												<mat-error *ngIf="form.get('color').hasError('required')" class="ml-1">
+													Color is <strong>required</strong>
+												</mat-error>
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Status</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field class="read-only">
+												<input formControlName="status" matInput type="text" [readonly]="true" />
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Market</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field class="read-only">
+												<input formControlName="subscriptionMarketName" matInput type="text" [readonly]="true" />
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Tag</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field class="read-only">
+												<input formControlName="subscriptionTag" matInput type="text" [readonly]="true" />
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">VIN</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field class="read-only">
+												<input formControlName="vin" matInput type="text" [readonly]="true" />
+												<mat-error *ngIf="form.get('vin').hasError('required')" class="ml-1">
+													VIN is <strong>required</strong>
+												</mat-error>
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Make</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field class="read-only">
+												<input formControlName="make" matInput type="text" [readonly]="true" />
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Model</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field class="read-only">
+												<input formControlName="model" matInput type="text" [readonly]="true" />
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Engine</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field class="read-only">
+												<input formControlName="engine" matInput type="text" [readonly]="true" />
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Trim</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field class="read-only">
+												<input formControlName="trim" matInput type="text" [readonly]="true" />
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<label class="col-md-4 col-3 col-form-label">Year</label>
+										<div class="col-md-8 col-9">
+											<mat-form-field class="read-only">
+												<input formControlName="year" matInput type="text" [readonly]="true" />
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="row mt-4">
+								<div class="col-md-6 col-sm-12 text-center">
+									<app-img-picker [url]="form.value.imgFront" [editable]="editable" imageType="vehicle" legend="Front"
+										(changed)="setVehicleImg('imgFront', $event)"></app-img-picker>
+								</div>
+								<div class="col-md-6 col-sm-12 text-center">
+									<app-img-picker [url]="form.value.imgRearWithPlate" [editable]="editable" imageType="vehicle"
+										legend="Rear W/Plate" (changed)="setVehicleImg('imgRearWithPlate', $event)"></app-img-picker>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div> -->
+
+<div class="main-content">
+	<div class="container-fluid">
+		<form [formGroup]="form" (submit)="saveVehicle()">
+			<div class="card">
+				<div class="card-header">
+					<div class="row align-items-center mt-3"
+						[ngClass]="{'justify-content-between': editable, 'justify-content-center': !editable}">
+						<!-- Back Button -->
+						<div *ngIf="!editable" class="col-md-3 col-12 mb-2 mb-md-0 text-md-left text-center">
+							<button mat-raised-button class="btn btn-info btn-link" type="button" (click)="cancel()">
+								<i class="material-icons">arrow_back</i> Back
+							</button>
+						</div>
+
+						<!-- Title -->
+						<div [ngClass]="editable ? 'col-md-6 text-left' : 'col-md-5 text-center'" class="col-12">
+							<h3 class="card-title mt-0">
+								<span class="text-warning font-weight-bold">{{ form.value.name }}</span>
+								<small>(<b>Status:</b> {{ form.value.status }})</small>
+							</h3>
+						</div>
+
+						<!-- Actions -->
+						<div [ngClass]="editable ? 'col-md-6 text-right' : 'col-md-4 text-right'"
+							class="col-12 mt-2 mt-md-0">
+							<button *ngIf="editable" mat-raised-button class="btn btn-danger mr-2" type="button"
+								(click)="cancel()">
+								Cancel
+							</button>
+							<button *ngIf="!editable" mat-raised-button class="btn btn-info" type="button"
+								(click)="editVehicle()">
+								Edit
+							</button>
+							<!-- <button *ngIf="editable" mat-raised-button class="btn btn-success" type="submit"
+								[disabled]="form.invalid">
+								Save changes
+							</button> -->
+							<button *ngIf="editable" mat-raised-button class="btn btn-success" type="submit"
+								[disabled]="form.invalid || form.get('name').hasError('duplicateVehicleName')">
+								Save changes
+							</button>
+
+
+						</div>
+					</div>
+				</div>
+
+				<div class="card-body">
+					<div class="row mt-4">
+						<!-- Name -->
+						<div class="col-lg-6 col-md-12 mb-3">
+							<mat-form-field appearance="outline" class="w-100" [ngClass]="{'read-only': !editable}">
+								<mat-label>Name</mat-label>
+								<input matInput formControlName="name" [readonly]="!editable" />
+								<mat-error *ngIf="form.get('name').hasError('required')">Name is
+									<strong>required</strong></mat-error>
+								<mat-error *ngIf="form.get('name').hasError('minlength')">Minimum <strong>6
+										characters</strong></mat-error>
+								<mat-error *ngIf="form.get('name').hasError('duplicateName')" class="ml-1">
+									Vehicle name must be <strong>unique</strong> for this host
+								</mat-error>
+
+
+							</mat-form-field>
+						</div>
+
+						<!-- Plate -->
+						<div class="col-lg-6 col-md-12 mb-3">
+							<mat-form-field appearance="outline" class="w-100" [ngClass]="{'read-only': !editable}">
+								<mat-label>Plate</mat-label>
+								<input matInput formControlName="licensePlate" [readonly]="!editable" />
+								<mat-error *ngIf="form.get('licensePlate').hasError('required')">Plate is
+									<strong>required</strong></mat-error>
+							</mat-form-field>
+						</div>
+
+						<!-- Plate State -->
+						<div class="col-lg-6 col-md-12 mb-3">
+							<mat-form-field appearance="outline" class="w-100" [ngClass]="{'read-only': !editable}">
+								<mat-label>Plate State</mat-label>
+								<ng-container *ngIf="editable; else stateReadOnly">
+									<mat-select formControlName="licensePlateState">
+										<mat-option *ngFor="let state of states" [value]="state.code">{{ state.name
+											}}</mat-option>
+									</mat-select>
+								</ng-container>
+								<ng-template #stateReadOnly>
+									<input matInput formControlName="licensePlateState" [readonly]="true" />
+								</ng-template>
+								<mat-error *ngIf="form.get('licensePlateState').hasError('required')">Please select the
+									state</mat-error>
+							</mat-form-field>
+						</div>
+
+						<!-- Color -->
+						<div class="col-lg-6 col-md-12 mb-3">
+							<mat-form-field appearance="outline" class="w-100" [ngClass]="{'read-only': !editable}">
+								<mat-label>Color</mat-label>
+								<ng-container *ngIf="editable; else colorReadOnly">
+									<mat-select formControlName="color">
+										<mat-option *ngFor="let color of colors" [value]="color">{{ color
+											}}</mat-option>
+									</mat-select>
+								</ng-container>
+								<ng-template #colorReadOnly>
+									<input matInput formControlName="color" [readonly]="true" />
+								</ng-template>
+								<mat-error *ngIf="form.get('color').hasError('required')">Color is
+									<strong>required</strong></mat-error>
+							</mat-form-field>
+						</div>
+
+						<!-- Read-only fields -->
+						<ng-container *ngFor="let field of [
+              { label: 'Status', control: 'status' },
+              { label: 'Market', control: 'subscriptionMarketName' },
+              { label: 'Tag', control: 'subscriptionTag' },
+              { label: 'VIN', control: 'vin' },
+              { label: 'Make', control: 'make' },
+              { label: 'Model', control: 'model' },
+              { label: 'Engine', control: 'engine' },
+              { label: 'Trim', control: 'trim' },
+              { label: 'Year', control: 'year' }
+            ]">
+							<div class="col-lg-6 col-md-12 mb-3">
+								<mat-form-field appearance="outline" class="w-100 read-only">
+									<mat-label>{{ field.label }}</mat-label>
+									<input matInput [formControlName]="field.control" readonly />
+								</mat-form-field>
+							</div>
+						</ng-container>
+					</div>
+
+					<!-- Images -->
+					<div class="row mt-4">
+						<div class="col-md-6 col-sm-12 text-center mb-3">
+							<app-img-picker [url]="form.value.imgFront" [editable]="editable" imageType="vehicle"
+								legend="Front" (changed)="setVehicleImg('imgFront', $event)">
+							</app-img-picker>
+						</div>
+						<div class="col-md-6 col-sm-12 text-center mb-3">
+							<app-img-picker [url]="form.value.imgRearWithPlate" [editable]="editable"
+								imageType="vehicle" legend="Rear W/Plate"
+								(changed)="setVehicleImg('imgRearWithPlate', $event)">
+							</app-img-picker>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

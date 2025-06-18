@@ -1,0 +1,557 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12 mr-auto ml-auto">
+        <div class="card">
+          <div class="card-header text-center">
+            <h3 class="card-title my-3" style="color: orange;">Activate Vehicle</h3>
+          </div>
+          <div class="card-body">
+            <mat-stepper #stepper [orientation]="(stepperOrientation | async)!" [linear]="true" labelPosition="bottom"
+              (selectionChange)="onStepChange($event)">
+
+              <mat-step label="Select Facility" [stepControl]="facilityForm">
+                <mat-tree [dataSource]="treeDataSource" [treeControl]="treeControl" class="facility-tree">
+
+                  <!-- Parent Node (Group Header) -->
+                  <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+                    <div class="group-header" matTreeNodeToggle>
+                      <mat-icon class="expand-icon">
+                        {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                      </mat-icon>
+                      <span class="group-title">{{ node.name }}</span>
+                    </div>
+
+                    <div *ngIf="treeControl.isExpanded(node)" class="facility-children">
+                      <ng-container matTreeNodeOutlet></ng-container>
+                    </div>
+                  </mat-nested-tree-node>
+
+                  <!-- Leaf Node (Facility Row) -->
+                  <mat-tree-node *matTreeNodeDef="let node">
+                    <div class="facility-node">
+                      <mat-radio-button [value]="node" [checked]="facilityForm?.value.id === node.id"
+                        [disabled]="node.isSubscriptionSoldOut" (change)="onChangeFacility(node)">
+                      </mat-radio-button>
+
+                     
+                      <div class="facility-info" style="display: flex; align-items: center; gap: 8px;">
+                        <div class="facility-name">{{ node.name }}</div>
+                        <button mat-icon-button (click)="selectedFacility = node; openModal()" class="info-btn"
+                          style="padding: 0;">
+                          <mat-icon>info</mat-icon>
+                        </button>
+
+                        <span class="facility-status"
+                          [ngClass]="{ 'sold-out': node.isSubscriptionSoldOut, 'available': !node.isSubscriptionSoldOut }"
+                          style="font-size: 0.9em;">
+                          ({{ node.isSubscriptionSoldOut ? 'SOLD OUT' : 'AVAILABLE' }})
+                        </span>
+                      </div>
+
+                      <div class="facility-price">
+                        {{ node.monthlyMembershipFee | currency:'USD' }}/Month
+                      </div>
+
+                    </div>
+                  </mat-tree-node>
+                </mat-tree>
+
+                <div class="row justify-content-end mt-3">
+                  <div class="col-md-auto col-12 d-flex gap-2 justify-content-end">
+                    <button mat-button class="btn btn-danger btn-step" (click)="cancel()">Cancel</button>
+                    <button mat-button matStepperNext class="btn btn-success btn-step"
+                      [disabled]="facilityForm?.invalid" (click)="makeUnlimitedAddons()">Next</button>
+                  </div>
+                </div>
+              </mat-step>
+
+              <mat-step *ngIf="isAllowedAddon" label="Unlimited Addon(s)" [stepControl]="unlimitedAddonForm">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead class="text-primary">
+                      <tr>
+                        <th style="width: 5%"></th>
+                        <th>Vehicle</th>
+                        <th>Location</th>
+                        <th>Car Park</th>
+                        <th>Rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <ng-container *ngFor="let addon of unlimitedAddons">
+                        <tr *ngIf="addon.rate > 0">
+                          <td>
+                            <mat-checkbox [checked]="addon.unlimitedOnlyFacility" [disabled]="
+                                addon.unlimitedOnlyFacility ||
+                                isCheckboxDisabled(addon)
+                              " (change)="onChangeAddon($event.checked, addon)"></mat-checkbox>
+                          </td>
+                          <td>{{ addon.vehicleName }}</td>
+                          <td>{{ addon.facilityName }}</td>
+                          <td>{{ addon.carParkName }}</td>
+                          <td>
+                            {{ addon.rate | currency : "USD" }}/Month (plus
+                            fees)
+                          </td>
+                        </tr>
+                      </ng-container>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="row justify-content-between">
+                  <div class="col-md-auto col-12">
+                    <button mat-button matStepperPrevious class="btn btn-fill btn-step btn-info">
+                      Back
+                    </button>
+                  </div>
+                  <div class="col-md-auto col-12">
+                    <button mat-button class="btn btn-fill btn-step btn-danger mr-2" (click)="cancel()">
+                      Cancel
+                    </button>
+                    <button mat-button matStepperNext class="btn btn-fill btn-step btn-success"
+                      [disabled]="unlimitedAddonForm?.invalid">
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </mat-step>
+
+              <mat-step *ngIf="receiptForm?.invalid" label="Credit Card" [stepControl]="receiptForm">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6 class="mb-0">Primary Credit Card</h6>
+                      </div>
+                      <div class="card-body">
+                        <h4 class="card-title text-center">
+                          <ng-container *ngIf="primaryCard">
+                            <img [src]="
+                                getIcon(
+                                  receiptForm
+                                    ?.get('primaryCard')
+                                    .get('cardType').value
+                                )
+                              " class="mr-1" /><span class="mr-3">{{
+                              receiptForm?.get("primaryCard").get("cardMask")
+                              .value
+                              }}</span>
+                            <small>Exp:
+                              {{
+                              receiptForm
+                              ?.get("primaryCard")
+                              .get("cardExpiration").value
+                              }}</small>
+                            <button mat-raised-button mat-min-fab
+                              class="btn btn-success btn-link btn-round btn-fab btn-sm ml-3" title="Change"
+                              (click)="addCreditCard(true)">
+                              <i class="material-icons">edit</i>
+                            </button>
+                          </ng-container>
+                          <ng-container *ngIf="!primaryCard">
+                            <button mat-raised-button mat-min-fab class="btn btn-info my-0"
+                              (click)="addCreditCard(true)">
+                              <i class="material-icons">add</i>
+                              Add
+                            </button>
+                            <i class="material-icons align-middle ml-3">credit_card</i>
+                          </ng-container>
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6 class="mb-0">Secondary Credit Card</h6>
+                      </div>
+                      <div class="card-body">
+                        <h4 class="card-title text-center">
+                          <ng-container *ngIf="secondaryCard">
+                            <img [src]="
+                                getIcon(
+                                  receiptForm
+                                    ?.get('secondaryCard')
+                                    .get('cardType').value
+                                )
+                              " class="mr-1" /><span class="mr-3">{{
+                              receiptForm?.get("secondaryCard").get("cardMask")
+                              .value
+                              }}</span>
+                            <small>Exp:
+                              {{
+                              receiptForm
+                              ?.get("secondaryCard")
+                              .get("cardExpiration").value
+                              }}</small>
+                            <button mat-raised-button mat-min-fab
+                              class="btn btn-rose btn-link btn-round btn-fab btn-sm ml-3" title="Make Primary"
+                              (click)="setToPrimary()">
+                              <i class="material-icons">swap_vert</i>
+                            </button>
+                          </ng-container>
+                          <ng-container *ngIf="!secondaryCard">
+                            <button mat-raised-button mat-min-fab class="btn btn-info my-0" (click)="addCreditCard()">
+                              <i class="material-icons">add</i>
+                              Add
+                            </button>
+                            <i class="material-icons align-middle ml-3">credit_card</i>
+                          </ng-container>
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row justify-content-center">
+                  <div class="col-md-9">
+                    <h5 class="text-center font-weight-normal text-rose">
+                      Note: You can add secondary payment method to prevent
+                      closing of account if primary fails for any reason.
+                    </h5>
+                  </div>
+                </div>
+                <div class="row justify-content-between">
+                  <div class="col-md-auto col-12">
+                    <button mat-button matStepperPrevious class="btn btn-fill btn-step btn-info">
+                      Back
+                    </button>
+                  </div>
+                  <div class="col-md-auto col-12">
+                    <button mat-button class="btn btn-fill btn-step btn-danger mr-2" (click)="cancel()">
+                      Cancel
+                    </button>
+                    <button mat-button matStepperNext class="btn btn-fill btn-step btn-success"
+                      [disabled]="receiptForm?.invalid">
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </mat-step>
+
+              <mat-step *ngIf="!shipmentForm?.value.isOpenShipment" label="Shipping Option"
+                [stepControl]="shipmentForm">
+                <div class="row justify-content-center">
+                  <div class="col-md-6">
+                    <div class="form-group mt-0">
+                      <label class="mb-0">Select Shipping Option for Tags</label>
+                      <mat-form-field>
+                        <mat-select (selectionChange)="onSelectShipment($event)">
+                          <mat-option *ngFor="let preference of mailingPreferenceOptions" [value]="preference">
+                            {{ preference.name | titlecase }}:
+                            {{ preference.price | currency : "USD" }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+                <div class="row align-items-center justify-content-between">
+                  <div class="col-md-auto col-12">
+                    <button mat-button matStepperPrevious class="btn btn-fill btn-step btn-info">
+                      Back
+                    </button>
+                  </div>
+                  <div class="col-md-auto col-12">
+                    <button mat-button class="btn btn-fill btn-step btn-danger mr-2" (click)="cancel()">
+                      Cancel
+                    </button>
+                    <button mat-button matStepperNext class="btn btn-fill btn-step btn-success"
+                      [disabled]="shipmentForm?.invalid">
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </mat-step>
+
+              <mat-step label="Confirmation">
+                <div class="text-center">
+                  <h5>
+                    You are purchasing a subscriptions to activate your
+                    vehicles({{ vehicleNames }})
+                  </h5>
+                  <h5>
+                    A subscription fee of
+                    <b>{{
+                      facilityForm?.get("amount").value | currency : "USD"
+                      }}</b>
+                    will be charged monthly starting today until canceled for
+                    each Vehicle.
+                  </h5>
+                  <h5 *ngIf="unlimitedAddonForm?.value.carParkIds.length">
+                    An Unlimited Addon fee of
+                    <span class="font-weight-bold">{{
+                      addonTotalRate(unlimitedAddonForm?.value)
+                      | currency : "USD"
+                      }}</span>
+                    will be charged monthly starting today until canceled for
+                    your vehicles({{ addonVehicleNames }})
+                  </h5>
+                  <mat-checkbox [(ngModel)]="isAgree" class="mt-3">By purchasing, I agree to the
+                    <a href="https://parkmyshare.com/terms" target="_blank">
+                      Terms of Service </a>,
+                    <a [href]="facilityForm?.get('rulesUrl').value" target="_blank">
+                      Site Rules </a>, and
+                    <a href="https://parkmyshare.com/subscription-pricing-agreement" target="_blank">
+                      Pricing Agreement
+                    </a>
+                  </mat-checkbox>
+                </div>
+                <div class="row justify-content-between">
+                  <div class="col-md-auto col-12">
+                    <button mat-button matStepperPrevious class="btn btn-fill btn-step btn-info">
+                      Back
+                    </button>
+                  </div>
+                  <div class="col-md-auto col-12">
+                    <button mat-button class="btn btn-fill btn-step btn-danger mr-2" (click)="cancel()">
+                      Cancel
+                    </button>
+                    <button mat-button class="btn btn-fill btn-step btn-success" [disabled]="!isAgree"
+                      (click)="finish()">
+                      Purchase
+                    </button>
+                  </div>
+                </div>
+              </mat-step>
+
+            </mat-stepper>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-credit-card-modal *ngIf="creditCardModalId" [modalId]="creditCardModalId" [gateway]="gateway"
+  (saved)="saveCardOnFile($event)" (canceled)="creditCardModalId = ''"></app-credit-card-modal>
+
+
+
+
+
+<div class="modal fade" id="quickLinkModal" tabindex="-1" role="dialog" aria-labelledby="quickLinkModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-fullwidth modal-dialog-scrollable custom-modal-width" style="padding-top: 10px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Facility's Information</h4>
+        <button type="button" class="close" aria-hidden="true" (click)="closeModal()">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div *ngIf="selectedFacility">
+          <ng-container *ngIf="selectedFacility as loc">
+            <div class="card mb-3">
+              <div class="card-header">
+                <h4>
+                  {{ loc.airportMarket ? loc.airportMarket + ' - ' : '' }}{{ loc.name }}
+                  (<span
+                    [ngClass]="loc.status === 'active' ? 'text-success' : loc.status === 'comingsoon' ? 'text-info' : 'text-danger'">
+                    {{ loc.status | titlecase }}
+                  </span>)
+                </h4>
+              </div>
+
+              <div class="card-body">
+                <div class="row">
+                  <!-- Left column -->
+                  <div class="col-12 col-lg-4">
+                    <img [src]="loc.imageUrl" width="100%" [alt]="'location-img-' + loc.id" />
+
+                    <div class="mt-4" *ngFor="let field of [
+                        { label: 'Status', value: loc.status | titlecase },
+                        { label: 'Name', value: loc.name },
+                        { label: 'Address', value: loc.address.address1 + (loc.address.address2 ? ' ' + loc.address.address2 : '') },
+                        { label: 'City', value: loc.address.city },
+                        { label: 'State', value: loc.address.state },
+                        { label: 'Zip', value: loc.address.zip }
+                      ]">
+                      <div class="row">
+                        <div class="col-4 text-right"><label>{{ field.label }}:</label></div>
+                        <div class="col-8">{{ field.value }}</div>
+                      </div>
+                    </div>
+
+                    <div class="row align-items-center mt-2">
+                      <div class="col-4 text-right"><label class="mb-0 text-nowrap">Map It:</label></div>
+                      <div class="col-8">
+                        <a class="btn btn-info btn-round btn-fab btn-sm"
+                          [href]="'https://maps.google.com/?q=' + loc.coordinate.coordinates[1] + ',' + loc.coordinate.coordinates[0]"
+                          target="_blank">
+                          <i class="material-icons">location_on</i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Right column -->
+                  <div class="col-12 col-lg-8 mt-3 mt-lg-0">
+                    <h5 class="font-weight-bold text-center">Pricing</h5>
+
+                    <div class="row">
+                      <div class="col-6 col-md-4 text-right"><label>Vehicle Subscription:</label></div>
+                      <div class="col-6 col-md-8">{{ loc.monthlyMembershipFee | currency : 'USD' }}/Month</div>
+
+                      <div class="col-6 col-md-4 text-right"><label>Max Guest Exit Fee:</label></div>
+                      <div class="col-6 col-md-8">{{ loc.travelerInvoiceParkingFee | currency : 'USD' }}/Invoice</div>
+
+                      <div class="col-6 col-md-4 text-right"><label>CC Processing Fee:</label></div>
+                      <div class="col-6 col-md-8">
+                        {{
+                        loc.activeCreditCardFee
+                        ? loc.activeCreditCardFee.isPercent
+                        ? (loc.activeCreditCardFee.adjustmentAmount | percent : '1.0-2')
+                        : (loc.activeCreditCardFee.adjustmentAmount | currency : 'USD')
+                        : '0.00%'
+                        }}
+                      </div>
+                    </div>
+
+                    <div class="row justify-content-center mt-3">
+                      <div *ngFor="let carPark of loc.carParks" class="col-md-6 mb-3">
+                        <div class="card">
+                          <div class="card-header text-center">
+                            <h6>{{ carPark.name }}</h6>
+                          </div>
+                          <div class="card-body">
+                            <!-- Daily Rate -->
+                            <div class="row">
+                              <div class="col-6 text-right"><label>{{ carPark.dailyRates.currentRate.name }}:</label>
+                              </div>
+                              <div class="col-6">
+                                {{
+                                carPark.dailyRates.currentRate.currentDiscountedAmount !== 0
+                                ? (carPark.dailyRates.currentRate.currentDiscountedAmount | currency : 'USD') + '/Day'
+                                : 'Unavailable'
+                                }}
+                              </div>
+                            </div>
+
+                            <!-- Daily Fees -->
+                            <div *ngFor="let fee of carPark.dailyRates.currentRate.fees.items" class="row">
+                              <div class="col-6 text-right"><label><small>{{ fee.name }}:</small></label></div>
+                              <div class="col-6">
+                                <small>{{
+                                  fee.adjustmentAmount !== 0
+                                  ? fee.isPercent
+                                  ? (fee.adjustmentAmount | percent : '1.0-2')
+                                  : (fee.adjustmentAmount | currency : 'USD')
+                                  : 'Unavailable'
+                                  }}</small>
+                              </div>
+                            </div>
+
+                            <!-- Reserved Space Rate -->
+                            <hr />
+                            <div class="row">
+                              <div class="col-6 text-right"><label>{{ carPark.reservedSpaceRates.currentRate.name
+                                  }}:</label></div>
+                              <div class="col-6">
+                                {{
+                                carPark.reservedSpaceRates.currentRate.currentDiscountedAmount !== 0
+                                ? (carPark.reservedSpaceRates.currentRate.currentDiscountedAmount | currency : 'USD')
+                                + '/Month'
+                                : 'Unavailable'
+                                }}
+                              </div>
+                            </div>
+
+                            <!-- Reserved Fees -->
+                            <div *ngFor="let fee of carPark.reservedSpaceRates.currentRate.fees.items" class="row">
+                              <div class="col-6 text-right"><label><small>{{ fee.name }}:</small></label></div>
+                              <div class="col-6">
+                                <small>{{
+                                  fee.adjustmentAmount !== 0
+                                  ? fee.isPercent
+                                  ? (fee.adjustmentAmount | percent : '1.0-2')
+                                  : (fee.adjustmentAmount | currency : 'USD')
+                                  : 'Unavailable'
+                                  }}</small>
+                              </div>
+                            </div>
+
+                            <!-- Unlimited Add-On -->
+                            <ng-container *ngIf="carPark.addOnUnlimitedRates.currentRate">
+                              <hr />
+                              <div class="row">
+                                <div class="col-6 text-right"><label>{{ carPark.addOnUnlimitedRates.currentRate.name
+                                    }}:</label></div>
+                                <div class="col-6">
+                                  {{
+                                  carPark.addOnUnlimitedRates.currentRate.currentDiscountedAmount !== 0
+                                  ? (carPark.addOnUnlimitedRates.currentRate.currentDiscountedAmount | currency :
+                                  'USD') + '/Month'
+                                  : 'Unavailable'
+                                  }}
+                                </div>
+                              </div>
+
+                              <div *ngFor="let fee of carPark.addOnUnlimitedRates.currentRate.fees.items" class="row">
+                                <div class="col-6 text-right"><label><small>{{ fee.name }}:</small></label></div>
+                                <div class="col-6">
+                                  <small>{{
+                                    fee.adjustmentAmount !== 0
+                                    ? fee.isPercent
+                                    ? (fee.adjustmentAmount | percent : '1.0-2')
+                                    : (fee.adjustmentAmount | currency : 'USD')
+                                    : 'Unavailable'
+                                    }}</small>
+                                </div>
+                              </div>
+                            </ng-container>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Exit Fees -->
+                    <ng-container *ngIf="loc?.tripFees?.length">
+                      <h5 class="font-weight-bold text-center mt-4">Exit Fees</h5>
+                      <div class="row">
+                        <ng-container *ngFor="let tripFee of loc.tripFees">
+                          <div
+                            *ngIf="(tripFee.tripFeeType === 'exitguestpay' || tripFee.tripFeeType === 'exit') && !tripFee.ignoreIfNonZero"
+                            class="col-md-6 mb-2">
+                            <div class="row">
+                              <div class="col-6 text-right"><label>{{ tripFee.fee.name }}:</label></div>
+                              <div class="col-6">
+                                {{
+                                tripFee.fee.isPercent
+                                ? (tripFee.fee.adjustmentAmount | percent : '1.0-2')
+                                : (tripFee.fee.adjustmentAmount | currency : 'USD')
+                                }}
+                              </div>
+                            </div>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </ng-container>
+
+                    <!-- Facility Fines -->
+                    <h5 class="font-weight-bold text-center mt-4">Facility Fines</h5>
+                    <ul>
+                      <li>Unattended cars that are found unlocked $25.00 fine daily.</li>
+                      <li>Cars without a permanently displayed AVI PMCS Tag $100.00 fine.</li>
+                      <li>Non-compliant or unauthorized Car Wash Fine $500.00</li>
+                      <li>Unauthorized vendor working on your vehicle $100.00 fine.</li>
+                      <li>Unauthorized host vehicle maintenance $100.00 fine.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+      </div>
+      <!-- Footer with close button -->
+      <div class="modal-footer justify-content-end">
+        <button type="button" class="btn btn-danger" (click)="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

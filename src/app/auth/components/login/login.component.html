@@ -1,0 +1,67 @@
+<div class="wrapper wrapper-full-page">
+  <div class="page-header login-page header-filter" filter-color="black">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4 col-md-6 col-sm-6 ml-auto mr-auto">
+          <form [formGroup]="form" class="form" (submit)="submit()">
+            <div class="card card-login card-hidden">
+              <div class="card-header card-header-primary text-center" [ngClass]="bgPrimaryCSS">
+                <img [src]="logo" height="36" (error)="logo='/assets/img/logo/logo-blue.png'" />
+              </div>
+              <div class="card-body">
+                <mat-form-field appearance="fill" floatLabel="auto">
+                  <i matPrefix class="material-icons mr-2">email</i>
+                  <input formControlName="email" matInput type="email" placeholder="Email" class="mb-2" />
+                  <mat-error *ngIf="form.get('email').hasError('required')" class="ml-1">
+                    Email is <strong>required</strong>
+                  </mat-error>
+                  <mat-error *ngIf="form.get('email').hasError('pattern')" class="ml-1">
+                    Email is not <strong>valid</strong>
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill" floatLabel="auto">
+                  <i matPrefix class="material-icons mr-2">lock_outline</i>
+                  <input formControlName="password" matInput type="password" placeholder="Password" class="mb-2" />
+                  <mat-error *ngIf="form.get('password').hasError('required')" class="ml-1">
+                    Password is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                <a routerLink="/reset-password" class="btn btn-link btn-danger btn-sm px-0 my-0 pull-right">Forgot
+                  password?</a>
+              </div>
+              <div class="card-footer d-block text-center px-3 mx-0">
+                <button class="btn btn-primary btn-block" [ngClass]="bgPrimaryCSS" type="submit"
+                  [disabled]="form.invalid || loading">
+                  Sign In
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm float-right" role="status"
+                    aria-hidden="true"></span>
+                </button>
+                Car share host and want to register?
+                <a routerLink="/register" class="btn btn-sm btn-link btn-info px-0">Sign Up</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer" style="z-index: 999">
+      <div class="container-fluid">
+        <nav>
+          <ul>
+            <li>
+              <a href="https://www.parkmycarshare.com/privacypolicy" target="_blank">
+                Privacy Policy
+              </a>
+            </li>
+            <li>
+              <a href="https://parkmyshare.com/terms" target="_blank">
+                Terms of Service
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+  </div>
+</div>

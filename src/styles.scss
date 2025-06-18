@@ -1,0 +1,94 @@
+.mat-radio-label {
+  margin-bottom: 0 !important;
+}
+
+.custom-select {
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 0 4px;
+  margin: 0 4px;
+}
+
+@media print {
+  .page-break {
+    break-after: page;
+  }
+
+  .no-print {
+    display: none;
+  }
+
+  ng-image-fullscreen-view
+    .ng-image-fullscreen-view
+    .lightbox-wrapper
+    .lightbox-div
+    .lightbox-image-main
+    .lightbox-image
+    .custom-image-main
+    img {
+    top: 50vh !important;
+    left: 50vw !important;
+    margin: unset !important;
+    transform: translate(-50%, -50%) !important;
+  }
+}
+
+.mat-step-icon-selected,
+.mat-step-icon-state-edit {
+  background-color: #ff9800 !important;
+}
+
+.btn-step {
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.mat-form-field-appearance-fill {
+  .mat-select-arrow-wrapper {
+    transform: none !important;
+  }
+}
+
+.mat-form-field-appearance-legacy {
+  .mat-form-field-infix {
+    padding: 0.5rem 0 !important;
+  }
+}
+
+.mat-form-field:not(.mat-form-field-appearance-legacy) {
+  .mat-form-field-suffix {
+    .mat-icon-button {
+      width: 1.5em !important;
+      vertical-align: middle;
+    }
+  }
+
+  .mat-datepicker-toggle-default-icon {
+    width: 1em !important;
+  }
+}
+
+.clipboard {
+  font-size: 1rem;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.ck-editor__editable_inline {
+  min-height: 100px !important;
+}
+
+.mat-option-disabled {
+  cursor: not-allowed !important;
+
+  &:hover {
+    background: transparent !important;
+    box-shadow: none !important;
+    color: rgba(0, 0, 0, 0.38) !important;
+  }
+}

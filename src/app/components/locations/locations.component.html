@@ -1,0 +1,336 @@
+<div class="main-content facility-list">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title text-center mt-3">Locations</h3>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-baseline">
+          <div class="col-md-3">
+            <mat-form-field>
+              <mat-label>Search</mat-label>
+              <input matInput [(ngModel)]="searchCriteria" (ngModelChange)="onSearch()" />
+            </mat-form-field>
+          </div>
+          <div class="col-md-2">
+            <mat-form-field>
+              <mat-label>Status</mat-label>
+              <mat-select [(ngModel)]="status" (ngModelChange)="onSearch()">
+                <mat-option [value]="'all'"> All </mat-option>
+                <mat-option [value]="'active'"> Active </mat-option>
+                <mat-option [value]="'soldout'"> Sold Out </mat-option>
+                <mat-option [value]="'comingsoon'"> Coming Soon </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-auto">
+            <mat-checkbox [(ngModel)]="hasReserved" (ngModelChange)="onSearch()">Has Reserved Space?</mat-checkbox>
+          </div>
+          <div class="col-md-auto">
+            <mat-checkbox [(ngModel)]="hasUnlimited" (ngModelChange)="onSearch()">Has AddOn Unlimited
+              Space?</mat-checkbox>
+          </div>
+        </div>
+        <div id="locationAccordion" role="tablist">
+          <div *ngFor="let loc of filteredLocations" class="card-collapse">
+            <div class="card-header" role="tab" [id]="'heading' + loc.id">
+              <h5 class="mb-0">
+                <a data-toggle="collapse" [href]="'#collapse' + loc.id" aria-expanded="false"
+                  [attr.aria-controls]="'collapse' + loc.id" class="collapsed">
+                  <h4>
+                    {{ loc.airportMarket ? loc.airportMarket + " - " : ""
+                    }}{{ loc.name }} (<span [ngClass]="
+                        loc.status === 'active'
+                          ? 'text-success'
+                          : loc.status === 'comingsoon'
+                          ? 'text-info'
+                          : 'text-danger'
+                      ">{{ loc.status | titlecase }}</span>)
+                    <i class="material-icons">keyboard_arrow_down</i>
+                  </h4>
+                </a>
+              </h5>
+            </div>
+            <div [id]="'collapse' + loc.id" class="collapse" role="tabpanel" [attr.aria-labelledby]="'heading' + loc.id"
+              data-parent="#locationAccordion">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-12 col-lg-4">
+                    <img [src]="loc.imageUrl" width="100%" [alt]="'location-img-' + loc.id" />
+                    <div class="row mt-4">
+                      <div class="col-4 col-sm-4 col-md-4 text-right">
+                        <label>Status: </label>
+                      </div>
+                      <div class="col-8 col-sm-8 col-md-8">{{ loc.status | titlecase }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-4 col-sm-4 col-md-4 text-right">
+                        <label>Name: </label>
+                      </div>
+                      <div class="col-8 col-sm-8 col-md-8">{{ loc.name }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-4 col-sm-4 col-md-4 text-right">
+                        <label>Address: </label>
+                      </div>
+                      <div class="col-8 col-sm-8 col-md-8">
+                        {{ loc.address.address1
+                        }}{{
+                        loc.address.address2 ? " " + loc.address.address2 : ""
+                        }}
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-4 col-sm-4 col-md-4 text-right">
+                        <label>City: </label>
+                      </div>
+                      <div class="col-8 col-sm-8 col-md-8">{{ loc.address.city }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-4 col-sm-4 col-md-4 text-right">
+                        <label>State: </label>
+                      </div>
+                      <div class="col-8 col-sm-8 col-md-8">{{ loc.address.state }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-4 col-sm-4 col-md-4 text-right">
+                        <label>Zip: </label>
+                      </div>
+                      <div class="col-8 col-sm-8 col-md-8">{{ loc.address.zip }}</div>
+                    </div>
+                    <div class="row align-items-center">
+                      <div class="col-4 col-sm-4 col-md-4 text-right">
+                        <label class="mb-0 text-nowrap">Map It: </label>
+                      </div>
+                      <div class="col-8 col-sm-8 col-md-8">
+                        <a mat-raised-button mat-min-fab class="btn btn-info btn-round btn-fab btn-sm" [href]="
+                            'https://maps.google.com/?q=' +
+                            loc.coordinate.coordinates[1] +
+                            ',' +
+                            loc.coordinate.coordinates[0]
+                          " target="_blank">
+                          <i class="material-icons">location_on</i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-lg-8 mt-2 mt-sm-2">
+                    <h5 class="font-weight-bold text-center">Pricing</h5>
+                    <div class="row">
+                      <div class="col-6 col-md-3 text-right">
+                        <label>Vehicle Subscription: </label>
+                      </div>
+                      <div class="col-6 col-md-3">
+                        {{ loc.monthlyMembershipFee | currency : "USD" }}/Month
+                      </div>
+                      <div class="col-6 col-md-3 text-right">
+                        <label>Max Guest Exit Fee: </label>
+                      </div>
+                      <div class="col-6 col-md-3">
+                        {{
+                        loc.travelerInvoiceParkingFee | currency : "USD"
+                        }}/Invoice
+                      </div>
+                      <div class="col-6 col-md-3 text-right">
+                        <label>CC Processing Fee: </label>
+                      </div>
+                      <div class="col-6 col-md-3">
+                        {{
+                        loc.activeCreditCardFee
+                        ? loc.activeCreditCardFee.isPercent
+                        ? (loc.activeCreditCardFee.adjustmentAmount
+                        | percent : "1.0-2")
+                        : (loc.activeCreditCardFee.adjustmentAmount
+                        | currency : "USD")
+                        : "0.00%"
+                        }}
+                      </div>
+                    </div>
+                    <div class="row justify-content-center mt-3">
+                      <div *ngFor="let carPark of loc.carParks" class="col-md-6">
+                        <div class="card">
+                          <div class="card-header">
+                            <h6 class="text-center">{{ carPark.name }}</h6>
+                          </div>
+                          <div class="card-body">
+                            <div class="row">
+                              <div class="col-6 col-sm-6 col-md-6 text-right">
+                                <label>{{ carPark.dailyRates.currentRate.name }}:
+                                </label>
+                              </div>
+                              <div class="col-6 col-sm-6 col-md-6">
+                                {{
+                                carPark.dailyRates.currentRate
+                                .currentDiscountedAmount !== 0
+                                ? (carPark.dailyRates.currentRate
+                                .currentDiscountedAmount
+                                | currency : "USD") + "/Day"
+                                : "Unavailable"
+                                }}
+                              </div>
+                            </div>
+                            <div *ngFor="
+                                let fee of carPark.dailyRates.currentRate.fees
+                                  .items
+                              " class="row">
+                              <div class="col-6 col-sm-6 col-md-6 text-right">
+                                <label><small>{{ fee.name }}: </small></label>
+                              </div>
+                              <div class="col-6 col-sm-6 col-md-6">
+                                <small>{{
+                                  fee.adjustmentAmount !== 0
+                                  ? fee.isPercent
+                                  ? (fee.adjustmentAmount
+                                  | percent : "1.0-2")
+                                  : (fee.adjustmentAmount
+                                  | currency : "USD")
+                                  : "Unavailable"
+                                  }}</small>
+                              </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                              <div class="col-6 col-sm-6 col-md-6 text-right">
+                                <label>{{
+                                  carPark.reservedSpaceRates.currentRate.name
+                                  }}:
+                                </label>
+                              </div>
+                              <div class="col-6 col-sm-6 col-md-6">
+                                {{
+                                carPark.reservedSpaceRates.currentRate
+                                .currentDiscountedAmount !== 0
+                                ? (carPark.reservedSpaceRates.currentRate
+                                .currentDiscountedAmount
+                                | currency : "USD") + "/Month"
+                                : "Unavailable"
+                                }}
+                              </div>
+                            </div>
+                            <div *ngFor="
+                                let fee of carPark.reservedSpaceRates
+                                  .currentRate.fees.items
+                              " class="row">
+                              <div class="col-6 col-sm-6 col-md-6 text-right">
+                                <label><small>{{ fee.name }}: </small></label>
+                              </div>
+                              <div class="col-6 col-sm-6 col-md-6">
+                                <small>{{
+                                  fee.adjustmentAmount !== 0
+                                  ? fee.isPercent
+                                  ? (fee.adjustmentAmount
+                                  | percent : "1.0-2")
+                                  : (fee.adjustmentAmount
+                                  | currency : "USD")
+                                  : "Unavailable"
+                                  }}</small>
+                              </div>
+                            </div>
+                            <ng-container *ngIf="carPark.addOnUnlimitedRates.currentRate">
+                              <hr />
+                              <div class="row">
+                                <div class="col-6 col-sm-6 col-md-6 text-right">
+                                  <label>{{
+                                    carPark.addOnUnlimitedRates.currentRate.name
+                                    }}:
+                                  </label>
+                                </div>
+                                <div class="col-6 col-sm-6 col-md-6">
+                                  {{
+                                  carPark.addOnUnlimitedRates.currentRate
+                                  .currentDiscountedAmount !== 0
+                                  ? (carPark.addOnUnlimitedRates.currentRate
+                                  .currentDiscountedAmount
+                                  | currency : "USD") + "/Month"
+                                  : "Unavailable"
+                                  }}
+                                </div>
+                              </div>
+                              <div *ngFor="
+                                  let fee of carPark.addOnUnlimitedRates.currentRate
+                                    .fees.items
+                                " class="row">
+                                <div class="col-6 col-sm-6 col-md-6 text-right">
+                                  <label><small>{{ fee.name }}: </small></label>
+                                </div>
+                                <div class="col-6 col-sm-6 col-md-6">
+                                  <small>{{
+                                    fee.adjustmentAmount !== 0
+                                    ? fee.isPercent
+                                    ? (fee.adjustmentAmount
+                                    | percent : "1.0-2")
+                                    : (fee.adjustmentAmount
+                                    | currency : "USD")
+                                    : "Unavailable"
+                                    }}</small>
+                                </div>
+                              </div>
+                            </ng-container>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <ng-container *ngIf="
+                                loc?.tripFees && loc?.tripFees?.length !== 0
+                              ">
+                      <h5 class="font-weight-bold text-center">Exit Fees</h5>
+                      <div class="row">
+                        <ng-container *ngFor="let tripFee of loc?.tripFees">
+                          <div
+                            *ngIf="(tripFee.tripFeeType === 'exitguestpay' || tripFee.tripFeeType === 'exit') && tripFee.ignoreIfNonZero === false"
+                            class="col-md-6 mb-2">
+                            <div class="row">
+                              <div class="col-6 col-sm-6 col-md-6 text-right">
+                                <label>{{ tripFee.fee.name }}:
+                                </label>
+                              </div>
+                              <div class="col-6 col-sm-6 col-md-6">
+                                {{
+                                tripFee.fee.isPercent
+                                ? (tripFee.fee.adjustmentAmount
+                                | percent : "1.0-2")
+                                : (tripFee.fee.adjustmentAmount
+                                | currency : "USD")
+                                }}
+                              </div>
+                            </div>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </ng-container>
+
+                    <h5 class="font-weight-bold text-center mt-4">Facility Fines</h5>
+                    <ul>
+                      <li>
+                        Unattended cars that are found unlocked $25.00 fine
+                        daily.
+                      </li>
+                      <li>
+                        Cars that fail to have a permanently displayed AVI PMCS
+                        Tag $100.00 fine.
+                      </li>
+                      <li>
+                        Non Compliant or unauthorized Car Wash Fine $500.00
+                      </li>
+                      <li>
+                        Unauthorized vendor working on your vehicle $100.00
+                        fine.
+                      </li>
+                      <li>
+                        Unauthorized host vehicle maintenance $100.00 fine.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h4 *ngIf="filteredLocations.length === 0" class="text-center my-5">
+            No locations
+          </h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

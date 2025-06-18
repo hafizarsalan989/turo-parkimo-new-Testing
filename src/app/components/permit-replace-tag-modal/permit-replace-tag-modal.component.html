@@ -1,0 +1,50 @@
+<div class="modal fade" [id]="modalId" tabindex="-1" role="dialog" [attr.aria-labelledby]="modalId +'Label'"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Replace Tag</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Select or manually enter the AVI Tag number you want
+          to assign to the vehicle, make sure the new tag is on
+          the vehicle as the old tag will be deactivated and new
+          activated in the next few minutes.
+        </p>
+        <div class="mt-3">
+          <div class="row">
+            <div class="col">
+              <mat-form-field *ngIf="!isManual" appearance="fill" floatLabel="auto">
+                <mat-select [(ngModel)]="tag" placeholder="Select Tag">
+                  <mat-option *ngFor="let tag of tags" [value]="tag">
+                    {{ tag }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field *ngIf="isManual" appearance="fill" floatLabel="auto">
+                <input matInput type="text" [(ngModel)]="tag" placeholder="Enter Tag ID" />
+              </mat-form-field>
+            </div>
+            <div class="col-auto">
+              <button mat-raised-button class="btn btn-info" (click)="getAssignedTags()"
+                title="Refresh"><i class="material-icons">sync</i></button>
+            </div>
+            <div class="col-auto">
+              <button mat-raised-button class="btn btn-success" (click)="isManual = !isManual"
+                [title]="isManual ? 'Select tag' : 'Manually enter tag ID'">{{isManual ? 'S' : 'M'}}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger btn-link mr-2" data-dismiss="modal">Close</button>
+        <button mat-raised-button type="button" class="btn btn-success" [disabled]="!tag"
+          (click)="replaceTag()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

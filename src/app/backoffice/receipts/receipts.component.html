@@ -1,0 +1,63 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header mt-3">
+        <h3 class="card-title text-center mt-0">Receipts</h3>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-baseline">
+          <div class="col-md-auto">
+            <label class="text-dark">Select date range: </label>
+          </div>
+          <div class="col-md-auto">
+            <mat-form-field>
+              <mat-date-range-input [formGroup]="rangeForm" [rangePicker]="picker">
+                <input matStartDate formControlName="startDate" readonly (click)="picker.open()">
+                <input matEndDate formControlName="endDate" readonly (click)="picker.open()"
+                  (dateChange)="getInvoices()">
+              </mat-date-range-input>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-date-range-picker #picker></mat-date-range-picker>
+
+              <mat-error *ngIf="rangeForm.controls.startDate.hasError('matStartDateInvalid')">Invalid start
+                date</mat-error>
+              <mat-error *ngIf="rangeForm.controls.endDate.hasError('matEndDateInvalid')">Invalid end
+                date</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <app-data-table [tableId]="tableId" [columnDefs]="columnDefs"
+          [defaultOrder]="{id: 3}" [actions]="actions" [data]="invoices">
+        </app-data-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="refundModal" tabindex="-1" role="dialog" aria-labelledby="refundModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <form [formGroup]="refundForm" (submit)="saveRefund()" class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Refund</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <mat-form-field appearance="fill" floatLabel="auto">
+          <textarea formControlName="reason" matInput rows="5" placeholder="Reason"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="fill" floatLabel="auto">
+          <input formControlName="amount" matInput placeholder="Amount" type="number" />
+          <span matPrefix class="mr-2">$</span>
+        </mat-form-field>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Cancel</button>
+        <button [disabled]="refundForm.invalid" mat-raised-button type="submit" class="btn btn-success">Process
+          Refund</button>
+      </div>
+    </form>
+  </div>
+</div>

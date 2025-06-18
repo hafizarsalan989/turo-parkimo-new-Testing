@@ -1,0 +1,188 @@
+<app-data-table [tableId]="tableId" [columnDefs]="columnDefs" [actions]="actions" [data]="filteredPermits"
+  [toolbar]="toolbar">
+</app-data-table>
+
+<app-img-viewer [images]="barcodes" [show]="showBarcodes" (onClose)="showBarcodes = false"></app-img-viewer>
+<app-cancel-permit-modal [modalId]="cancelPermitModalId" [permit]="selectedPermit"
+  (cancel)="onChange($event)"></app-cancel-permit-modal>
+<app-permit-replace-tag-modal [modalId]="permitReplaceTagModalId" [permitId]="selectedPermit?.id"
+  (replace)="onChange($event)"></app-permit-replace-tag-modal>
+
+<div class="modal fade" id="unlimitedAddonModal" tabindex="-1" role="dialog" aria-labelledby="unlimitedAddonModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Unlimited Addon</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="text-primary">
+              <tr>
+                <th style="width: 5%"></th>
+                <th>Location</th>
+                <th>Car Park</th>
+                <th>Rate</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="hasValidAddons; else noData">
+                <ng-container *ngFor="let addon of unlimitedAddon">
+                  <tr *ngIf="addon.rate > 0">
+                    <td>
+                      <mat-checkbox [checked]="isAddon(addon)" [disabled]="isCheckboxDisabled(addon)"
+                        (change)="onChangeAddon($event.checked, addon)"></mat-checkbox>
+                    </td>
+                    <td>{{ addon.facilityName }}</td>
+                    <td>{{ addon.carParkName }}</td>
+                    <td>{{ addon.rate ?? 0 | currency : 'USD' }}/Month</td>
+                    <td>
+                      <button mat-raised-button mat-min-fab
+                        class="btn btn-success btn-link btn-round btn-fab btn-sm ml-3" title="Edit"
+                        (click)="editUnlimitedAddon(addon)">
+                        <i class="material-icons">edit</i>
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+
+              <ng-template #noData>
+                <tr>
+                  <td colspan="5" class="text-center">No available data</td>
+                </tr>
+              </ng-template>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger btn-link mr-2" data-dismiss="modal">
+          Close
+        </button>
+        <button mat-raised-button type="button" class="btn btn-success" [disabled]="!hasChangedAddon()"
+          (click)="saveAddon()">
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editUnlimitedAddonModal" tabindex="-1" role="dialog"
+  aria-labelledby="editUnlimitedAddonModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Edit Unlimited Addon</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="unlimitedAddonForm">
+          <div formArrayName="discounts">
+            <div class="d-flex">
+              <h6 class="d-flex align-items-center pt-2">Discounts</h6>
+              <button mat-raised-button mat-min-fab class="btn btn-success btn-link btn-round btn-fab btn-sm ml-3"
+                title="Add Discount" (click)="addDiscount()">
+                <i class="material-icons">add</i>
+              </button>
+            </div>
+            <div *ngFor="let discount of discounts.controls; let i = index" [formGroupName]="i"
+              class="d-flex justify-content-center align-items-center">
+              <div class="col-md-5">
+                <mat-form-field class="mb-2">
+                  <mat-label>Name</mat-label>
+                  <input matInput id="name-{{ i }}" type="text" formControlName="name"
+                    (focus)="onFieldFocus(discount.get('name'))" (blur)="onFieldBlur(discount.get('name'))" />
+                  <mat-error *ngIf="discount.get('name').hasError('required')">Name is required</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-5">
+                <mat-form-field class="mb-2">
+                  <mat-label>Amount</mat-label>
+                  <span matPrefix *ngIf="!discount.isPercent">$</span>
+                  <input matInput id="adjustmentAmount-{{ i }}" type="number" formControlName="adjustmentAmount"
+                    (focus)="onFieldFocus(discount.get('adjustmentAmount'))"
+                    (blur)="onFieldBlur(discount.get('adjustmentAmount'))" />
+                  <span matSuffix *ngIf="discount.isPercent">%</span>
+                  <mat-error *ngIf="
+                      discount.get('adjustmentAmount').hasError('required')
+                    ">AdjustmentAmount is required</mat-error>
+                  <mat-error *ngIf="discount.get('adjustmentAmount').hasError('min')">It should be greater than
+                    <strong>0</strong></mat-error>
+                  <mat-error *ngIf="discount.get('adjustmentAmount').hasError('max')">It should be less than
+                    <strong>100</strong></mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2">
+                <button mat-raised-button mat-min-fab class="btn btn-danger btn-link btn-round btn-fab btn-sm"
+                  title="Delete" (click)="deleteDiscount(i)">
+                  <i class="material-icons">delete</i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div formArrayName="fees">
+            <div class="d-flex">
+              <h6 class="d-flex align-items-center pt-2">Fees</h6>
+              <button mat-raised-button mat-min-fab class="btn btn-success btn-link btn-round btn-fab btn-sm"
+                title="Add Fee" (click)="addFee()">
+                <i class="material-icons">add</i>
+              </button>
+            </div>
+            <div *ngFor="let fee of fees.controls; let i = index" [formGroupName]="i"
+              class="d-flex justify-content-center align-items-center">
+              <div class="col-md-5">
+                <mat-form-field class="mb-2">
+                  <mat-label>Name</mat-label>
+                  <input matInput id="name-{{ i }}" type="text" formControlName="name"
+                    (focus)="onFieldFocus(fee.get('name'))" (blur)="onFieldBlur(fee.get('name'))" />
+                  <mat-error *ngIf="fee.get('name').hasError('required')">Name is required</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-5">
+                <mat-form-field class="mb-2">
+                  <mat-label>Amount</mat-label>
+                  <span matPrefix *ngIf="!fee.isPercent">$</span>
+                  <input matInput id="adjustmentAmount-{{ i }}" type="number" formControlName="adjustmentAmount"
+                    (focus)="onFieldFocus(fee.get('adjustmentAmount'))"
+                    (blur)="onFieldBlur(fee.get('adjustmentAmount'))" />
+                  <span matSuffix *ngIf="fee.isPercent">%</span>
+                  <mat-error *ngIf="fee.get('adjustmentAmount').hasError('required')">AdjustmentAmount is
+                    required</mat-error>
+                  <mat-error *ngIf="fee.get('adjustmentAmount').hasError('min')">It should be greater than
+                    <strong>0</strong></mat-error>
+                  <mat-error *ngIf="fee.get('adjustmentAmount').hasError('max')">It should be less than
+                    <strong>100</strong></mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2">
+                <button mat-raised-button mat-min-fab class="btn btn-danger btn-link btn-round btn-fab btn-sm"
+                  title="Delete" (click)="deleteFee(i)">
+                  <i class="material-icons">delete</i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger btn-link mr-2" data-dismiss="modal">
+          Close
+        </button>
+        <button mat-raised-button type="button" class="btn btn-success" [disabled]="!hasChanged()"
+          (click)="saveDiscountAndFee()">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

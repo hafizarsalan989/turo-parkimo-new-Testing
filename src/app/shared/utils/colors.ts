@@ -1,0 +1,16 @@
+export const COLORS: string[] = [
+  "White",
+  "Black",
+  "Gray",
+  "Silver",
+  "Blue",
+  "Red",
+  "Brown",
+  "Green",
+  "Orange",
+  "Beige",
+  "Purple",
+  "Gold",
+  "Yellow",
+  "Other",
+];

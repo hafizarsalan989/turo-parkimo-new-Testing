@@ -1,0 +1,19 @@
+.flag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 40px;
+}
+
+.flag-yes {
+  background-color: #4caf50; // green
+  color: white;
+}
+
+.flag-no {
+  background-color: #f44336; // red
+  color: white;
+}

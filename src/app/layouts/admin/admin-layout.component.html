@@ -1,0 +1,157 @@
+<!-- <div class="wrapper">
+	<div class="sidebar" data-color="white" data-background-color="black">
+		<app-sidebar-cmp></app-sidebar-cmp>
+	</div>
+	<div class="main-panel">
+		<div>
+			<app-navbar-cmp></app-navbar-cmp>
+		</div>
+		<router-outlet>
+			<div *ngIf="loading" class="admin-spinner">
+				<img src="assets/img/spinner.gif" height="256" />
+			</div>
+		</router-outlet>
+		<div>
+			<app-footer-cmp></app-footer-cmp>
+		</div>
+	</div>
+</div> -->
+
+<div class="wrapper">
+	<div class="sidebar" data-color="white" data-background-color="black">
+		<app-sidebar-cmp></app-sidebar-cmp>
+	</div>
+	<div class="main-panel">
+		<div>
+			<app-navbar-cmp></app-navbar-cmp>
+		</div>
+		<router-outlet>
+			<div *ngIf="loading" class="admin-spinner">
+				<img src="assets/img/spinner.gif" height="256" />
+			</div>
+		</router-outlet>
+		<div>
+			<app-footer-cmp></app-footer-cmp>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="welcomeModal" tabindex="-1" role="dialog" aria-labelledby="welcomeModalLabel"
+	aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title font-weight-bold mt-0">Welcome!</h3>
+				<button mat-button type="button" class="close" aria-hidden="true" (click)="onCloseWelcome()">
+					<i class="material-icons">clear</i>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>To use a Park My Share facility you need an active vehicle assigned to a market. This allows your
+					vehicle to park in any given full service PMCS facility in the market. For each active vehicle
+					requires an associated AVI tag installed permanently on your vehicle like a toll pass. You get one
+					free AVI tag per active vehicle, all you pay for is shipping.</p>
+				<h5 class="font-weight-normal">What's Next?</h5>
+				<div class="row mb-2">
+					<div class="col-auto pr-0">
+						<mat-checkbox [ngModel]="hasVehicles" [disabled]="true"></mat-checkbox>
+					</div>
+					<div class="col">
+						Register your vehicles
+						<a routerLink="/host/vehicle/list" (click)="onCloseWelcome()">
+							HERE
+						</a>.
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-auto pr-0">
+						<mat-checkbox [ngModel]="hasPermits" [disabled]="true"></mat-checkbox>
+					</div>
+					<div class="col">
+						Activate your vehicle subscription <a routerLink="/host/vehicle/list"
+							(click)="onCloseWelcome()">HERE</a>.
+					</div>
+				</div>
+				<div class="row mb-3">
+					<div class="col-auto pr-0">
+						<mat-checkbox [ngModel]="hasPermits" [disabled]="true"></mat-checkbox>
+					</div>
+					<div class="col">
+						Once you receive your AVI tags you assign one to each vehicle
+						<a routerLink="/host/vehicle/list" (click)="onCloseWelcome(true)">
+							HERE
+						</a> and install on the vehicle. Now you are ready to park!
+					</div>
+				</div>
+				<p>AVI tags are available for purchase <a routerLink="/host/tag-ordering"
+						(click)="onCloseWelcome()">HERE</a>.
+					You should consider having a stock on hand to expedite the process for windshield replacements or
+					new car additions.</p>
+			</div>
+			<div class="modal-footer">
+				<mat-checkbox class="mr-4" [ngModel]="noWelcome" (ngModelChange)="onCloseWelcomePermanent()"><span
+						class="text-dark">Don't show this anymore</span></mat-checkbox>
+				<button mat-raised-button type="button" class="btn btn-danger mr-2"
+					(click)="onCloseWelcome()">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="hostMessageModal" tabindex="-1" role="dialog" aria-labelledby="hostMessageModalLabel"
+	aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title font-weight-bold mt-0">Message Details</h3>
+				<button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					<i class="material-icons">clear</i>
+				</button>
+			</div>
+			<div class="modal-body">
+				<label>Subject</label>
+				<div>{{ hostMessage?.subject }}</div>
+				<label>Message</label>
+				<ckeditor [editor]="editor" [config]="{toolbar: []}" [data]="hostMessage?.messageText"
+					[disabled]="true"></ckeditor>
+			</div>
+			<div class="modal-footer">
+				<button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="documentsAgreeModal" tabindex="-1" role="dialog" aria-labelledby="documentsAgreeModalLabel"
+	aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog">
+		<form class="modal-content" [formGroup]="documentsForm" (submit)="onSubmitAgree()">
+			<div class="modal-header">
+				<h3 class="modal-title font-weight-bold mt-0">Documents Updated!</h3>
+			</div>
+			<div class="modal-body">
+				<h5 class="font-weight-normal">The below documents have been updated, please review and verify below.
+				</h5>
+				<div formArrayName="checkboxes">
+					<div *ngFor="let control of checkboxes.controls; let i = index" [formGroupName]="i"
+						class="row mb-2">
+						<div class="col-auto pr-0">
+							<mat-checkbox formControlName="agreeDocument"></mat-checkbox>
+						</div>
+						<div class="col">
+							{{ checkboxes.at(i).get("documentType")?.value }} (V{{
+							checkboxes.at(i).get("documentVersion")?.value }})&nbsp;
+							<a [href]="getDocumentLink(checkboxes.at(i).get('documentType')?.value)" target="_blank"
+								(click)="onLinkClick(i)">HERE</a>.
+						</div>
+					</div>
+				</div>
+				<p class="text-info">(Must view each document before you can agree to it.)</p>
+			</div>
+			<div class="modal-footer">
+				<button mat-raised-button type="submit" class="btn btn-info mr-2"
+					[disabled]="documentsForm.invalid">Agree</button>
+			</div>
+		</form>
+	</div>
+</div>

@@ -1,0 +1,153 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title text-center mt-3">Guest Pay Management</h3>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 col-12">
+            <div class="card card-stats pb-4">
+              <div class="card-header card-header-success card-header-icon">
+                <div class="card-icon">
+                  <i class="material-icons">attach_money</i>
+                </div>
+                <p class="card-category">Current Balance</p>
+                <h3 class="card-title">
+                  <span class="font-weight-bold">{{ summary?.currentBalance | currency }}</span>
+                </h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 col-12">
+            <div class="card card-stats pb-4">
+              <div class="card-header card-header-info card-header-icon">
+                <div class="card-icon">
+                  <i class="material-icons">done</i>
+                </div>
+                <p class="card-category">Total Available for Withdrawl</p>
+                <h3 class="card-title">
+                  <span class="font-weight-bold">{{ summary?.availableWithdrawal | currency }}</span>
+                </h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 col-12">
+            <div class="card card-stats pb-4">
+              <div class="card-header card-header-primary card-header-icon">
+                <div class="card-icon">
+                  <i class="material-icons">done_all</i>
+                </div>
+                <p class="card-category">Total Withdrawls</p>
+                <h3 class="card-title">
+                  <span class="font-weight-bold">{{ summary?.totalWithdrawal | currency }}</span>
+                </h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ul class="nav nav-pills nav-pills-warning" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#invoice" role="tablist">
+              Invoice
+            </a>
+          </li>
+        </ul>
+        <div class="tab-content tab-space">
+          <div class="tab-pane active" id="invoice">
+            <app-table [columnDefs]="columnDefs" [data]="tableData" [matSortActive]="matSortActive">
+              <form [formGroup]="form" action>
+                <div class="row align-items-baseline justify-content-end">
+                  <div class="col-md-2 col-12">
+                    <mat-form-field appearance="fill">
+                      <mat-select formControlName="companyId" placeholder="Select host">
+                        <mat-option *ngFor="let host of hosts" [value]="host.id">
+                          {{ host.companyName }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-2 col-12">
+                    <mat-form-field appearance="fill">
+                      <input formControlName="startDate" matInput [matDatepicker]="startPicker"
+                        (click)="startPicker.open()" placeholder="Start" />
+                      <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                      <mat-datepicker #startPicker></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-2 col-12">
+                    <mat-form-field appearance="fill">
+                      <input formControlName="endDate" matInput [matDatepicker]="endPicker" (click)="endPicker.open()"
+                        placeholder="End" />
+                      <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                      <mat-datepicker #endPicker></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-2 col-12">
+                    <mat-form-field appearance="fill">
+                      <mat-select formControlName="status" placeholder="Select status">
+                        <mat-option *ngFor="let status of statuses" [value]="status.value">
+                          {{ status.label }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-auto col-12">
+                    <button mat-raised-button type="button" class="btn btn-info" (click)="onClear()">
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+              </form>
+              <ng-template #tdActions let-row="row">
+                <button mat-raised-button type="button" class="btn btn-info mx-1" title="View"
+                  (click)="onView(row.billbackId)">
+                  <i class="material-icons">visibility</i>
+                </button>
+                <button *ngIf="row.status === 'due' || row.status === 'past due' || row.status === 'failed'"
+                  mat-raised-button type="button" class="btn btn-danger mx-1" title="Cancel"
+                  (click)="onCancel(row.billbackId)">
+                  <i class="material-icons">cancel</i>
+                </button>
+                <button *ngIf="row.status === 'paid'" mat-raised-button type="button" class="btn btn-danger mx-1"
+                  title="Refund" (click)="onRefund(row.billbackId)">
+                  <i class="material-icons">currency_exchange</i>
+                </button>
+              </ng-template>
+            </app-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="hostBillbackRefundModal" tabindex="-1" role="dialog"
+  aria-labelledby="hostBillbackRefundModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form [formGroup]="refundForm" (submit)="saveRefund()" class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Refund</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <mat-form-field appearance="fill" floatLabel="auto">
+          <input formControlName="amount" matInput placeholder="Amount" type="number" />
+          <span matPrefix class="mr-2">$</span>
+          <mat-hint>Only full amount can be refunded. No partials</mat-hint>
+        </mat-form-field>
+        <mat-form-field appearance="fill" floatLabel="auto">
+          <textarea formControlName="reason" matInput rows="5" placeholder="Reason"></textarea>
+        </mat-form-field>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Cancel</button>
+        <button [disabled]="refundForm.invalid" mat-raised-button type="submit" class="btn btn-success">Process
+          Refund</button>
+      </div>
+    </form>
+  </div>
+</div>

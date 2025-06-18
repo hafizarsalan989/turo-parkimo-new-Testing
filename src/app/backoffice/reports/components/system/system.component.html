@@ -1,0 +1,23 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">System Reports</h3>
+          </div>
+          <div class="card-body">
+            <app-table [columnDefs]="columnDefs" [data]="tableData" [showSearch]="false">
+              <ng-template #tdActions let-row="row">
+                <button mat-raised-button type="button" class="btn btn-info mx-1"
+                  title="Export CSV" (click)="onExport(row)">
+                  <i class="material-icons">download</i>
+                </button>
+              </ng-template>
+            </app-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

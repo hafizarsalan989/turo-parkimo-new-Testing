@@ -1,0 +1,196 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div *ngIf="workQueue" class="card">
+          <div class="card-header">
+            <div class="row align-items-center mt-3">
+              <div class="col-md-4">
+                <button *ngIf="!editable" mat-raised-button class="btn btn-info btn-link px-0" type="button"
+                  (click)="close()">
+                  <i class="material-icons">arrow_back</i> Back
+                </button>
+              </div>
+              <div class="col-md-4">
+                <h3 class="card-title text-center mt-0">Work Queue Details</h3>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md d-flex">
+                <h4 class="mb-0"><b>Requested Action: </b><span class="text-warning">{{workQueue.action}}</span></h4>
+                <h4 class="mb-0 ml-4"><b>Turo Host: </b><span
+                    class="text-warning">{{workQueue.host?.companyName}}</span></h4>
+              </div>
+              <div class="col-md-auto">
+                <button mat-raised-button class="btn btn-danger mr-2" type="button" (click)="onReject()">
+                  Reject
+                </button>
+                <button mat-raised-button class="btn btn-success" type="button" (click)="onConfirm()">
+                  Confirm
+                </button>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-5 font-weight-bold text-right pr-0">Barcode: </div>
+                  <div class="col-7" [innerHTML]="workQueue.metadata"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-5 font-weight-bold text-right pr-0">Facility: </div>
+                  <div class="col-7">{{ workQueue.facility?.name }}</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-5 font-weight-bold text-right pr-0">Vehicle Name: </div>
+                  <div class="col-7">{{ workQueue.vehicle?.name }}</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-5 font-weight-bold text-right pr-0">Vehicle VIN: </div>
+                  <div class="col-7">{{ workQueue.vehicle?.vin }}</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-5 font-weight-bold text-right pr-0">Vehicle Plate: </div>
+                  <div class="col-7">{{ workQueue.vehicle?.licensePlate }}</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-5 font-weight-bold text-right pr-0">Vehicle Make: </div>
+                  <div class="col-7">{{ workQueue.vehicle?.make }}</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-5 font-weight-bold text-right pr-0">Vehicle Model: </div>
+                  <div class="col-7">{{ workQueue.vehicle?.model }}</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-5 font-weight-bold text-right pr-0">Vehicle Year: </div>
+                  <div class="col-7">{{ workQueue.vehicle?.year }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div *ngIf="workQueue.vehicle?.imgFront" class="col-md-3 text-center">
+                <legend>Front</legend>
+                <img [src]="workQueue.vehicle.imgFront" class="rounded" width="100%" alt="Front Image" />
+              </div>
+              <div *ngIf="workQueue.vehicle?.imgDriverSide" class="col-md-3 text-center">
+                <legend>Driver Side</legend>
+                <img [src]="workQueue.vehicle.imgDriverSide" class="rounded" width="100%" alt="Driver Side Image" />
+              </div>
+              <div *ngIf="workQueue.vehicle?.imgPassengerSide" class="col-md-3 text-center">
+                <legend>Passenger Side</legend>
+                <img [src]="workQueue.vehicle.imgPassengerSide" class="rounded" width="100%"
+                  alt="Passenger Side Image" />
+              </div>
+              <div *ngIf="workQueue.vehicle?.imgRearWithPlate" class="col-md-3 text-center">
+                <legend>Rear W/Plate</legend>
+                <img [src]="workQueue.vehicle.imgRearWithPlate" class="rounded" width="100%" alt="Rear W/Plate Image" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="table-responsive mt-4">
+                  <h5 class="font-weight-bold text-center">Vehicle Pass History</h5>
+                  <table class="table">
+                    <thead class="text-primary">
+                      <tr>
+                        <th style="width: 33%">Facility</th>
+                        <th style="width: 33%">Status</th>
+                        <th>Date Created</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let history of historyData">
+                        <td>{{ history.facility.name }}</td>
+                        <td>{{ history.status | titlecase }}</td>
+                        <td>{{ history.created | date: 'MM/dd/yyyy hh:mm a' }}</td>
+                      </tr>
+                      <tr *ngIf="historyData.length === 0">
+                        <td [colSpan]="3" class="text-center">No data</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="col">
+                <div class="table-responsive mt-4">
+                  <h5 class="font-weight-bold text-center">Attachments</h5>
+                  <table class="table">
+                    <thead class="text-primary">
+                      <tr>
+                        <th></th>
+                        <th style="width: 35%">Uploaded By</th>
+                        <th style="width: 35%">Date Uploaded</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let file of files">
+                        <td>
+                          <img [src]="file.thumbnailUrl" class="rounded" width="48px" role="button"
+                            (click)="onPreview(file)" />
+                        </td>
+                        <td>{{ file.uploadedEmail }}</td>
+                        <td>{{ file.created | date: 'MM/dd/yyyy hh:mm a' }}</td>
+                      </tr>
+                      <tr *ngIf="files.length === 0">
+                        <td [colSpan]="3" class="text-center">No data</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 text-right">
+              <button mat-raised-button class="btn btn-danger mr-2" type="button" (click)="onReject()">
+                Reject
+              </button>
+              <button mat-raised-button class="btn btn-success" type="button" (click)="onConfirm()">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-img-viewer [images]="previewFiles" [show]="showPreview" (onClose)="showPreview = false"></app-img-viewer>
+
+<div class="modal fade" id="workQueueRejectModal" tabindex="-1" role="dialog"
+  aria-labelledby="workQueueRejectModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form [formGroup]="rejectForm" (submit)="saveStatus(true, rejectForm.value.message)" class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Refund</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <mat-form-field appearance="fill" floatLabel="auto">
+          <textarea formControlName="message" matInput rows="5" placeholder="Reason"></textarea>
+        </mat-form-field>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger mr-2" data-dismiss="modal">Cancel</button>
+        <button [disabled]="rejectForm.invalid" mat-raised-button type="submit" class="btn btn-success">Process
+          Reject</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,7 @@
+:host {
+  .btn-sm-block {
+    @media (max-width: 576px) {
+      width: 100%;
+    }
+  }
+}

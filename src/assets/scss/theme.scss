@@ -1,0 +1,48 @@
+@mixin colorClass($attr, $color) {
+  .#{$attr}-#{$color} {
+    #{$attr}: #{"#" + $color} !important;
+  }
+}
+
+// Parkimo
+@include colorClass("background", "f49d1a");
+@include colorClass("color", "f49d1a");
+
+// Park My Car Share
+@include colorClass("background", "8ccb9a");
+@include colorClass("color", "8ccb9a");
+
+.md-drppicker {
+  top: 40.75px !important;
+  padding: 16px !important;
+  width: max-content !important;
+  // @media (min-width: 768px) {
+  //   width: 625px !important;
+  // }
+
+  .ranges ul li {
+    margin-bottom: 4px;
+  }
+
+  .buttons {
+    margin: 0 !important;
+  }
+
+  .ranges ul li button.active,
+  td.active,
+  .btn {
+    background-color: $brand-success !important;
+  }
+
+  .ranges ul li button.active,
+  .btn {
+    border-radius: 4px;
+    font-weight: bold;
+  }
+
+  .btn {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    margin: 8px 0 0 0 !important;
+  }
+}

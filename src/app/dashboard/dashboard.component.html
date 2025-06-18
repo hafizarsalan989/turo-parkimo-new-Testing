@@ -1,0 +1,267 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <ng-container *ngIf="host">
+      <h3>Turo Host</h3>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead class="text-primary">
+                    <tr>
+                      <th style="width: 30%;">Facility</th>
+                      <th style="width: 30%;">Cars in Facility</th>
+                      <th style="width: 30%;">Parking Sessions this Month</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let use of host.facilityUse">
+                      <td>{{ use.facilityName }}</td>
+                      <td>{{ use.carsInFacility | number }}</td>
+                      <td>{{ use.parkingSessionsThisMonth | number }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4 col-md-6 col-sm-6">
+          <div class="card card-stats">
+            <div class="card-header card-header-warning card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons">drive_eta</i>
+              </div>
+              <p class="card-category">Active Cars</p>
+              <h3 class="card-title">{{ host.activeCars | number }}</h3>
+            </div>
+            <div class="card-footer border-0 p-0 mb-0">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-6">
+          <div class="card card-stats">
+            <div class="card-header card-header-rose card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons">factory</i>
+              </div>
+              <p class="card-category">Registered Facilities</p>
+              <h3 class="card-title">{{ host.registeredFacilities | number }}</h3>
+            </div>
+            <div class="card-footer border-0 p-0 mb-0">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-6">
+          <div class="card card-stats">
+            <div class="card-header card-header-success card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons">calendar_month</i>
+              </div>
+              <p class="card-category">Parking Days
+                <small>(This Month)</small>
+              </p>
+              <h3 class="card-title">{{ host.parkingDaysThisMonth | currency: 'USD' }}</h3>
+            </div>
+            <div class="card-footer border-0 p-0 mb-0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="facility">
+      <h3>Parking Facility</h3>
+      <div class="row">
+        <div class="col-lg-4 col-md-6 col-sm-6">
+          <div class="card card-stats">
+            <div class="card-header card-header-warning card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons">drive_eta</i>
+              </div>
+              <p class="card-category">Active Cars</p>
+              <h3 class="card-title">{{ facility.activeCars | number }}</h3>
+            </div>
+            <div class="card-footer border-0 p-0 mb-0">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-6">
+          <div class="card card-stats">
+            <div class="card-header card-header-rose card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons">person</i>
+              </div>
+              <p class="card-category">Registered Users</p>
+              <h3 class="card-title">{{ facility.registeredVehicles | number }}</h3>
+            </div>
+            <div class="card-footer border-0 p-0 mb-0">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-6">
+          <div class="card card-stats">
+            <div class="card-header card-header-success card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons">calendar_month</i>
+              </div>
+              <p class="card-category">Parking Days
+                <small>(This Month)</small>
+              </p>
+              <h3 class="card-title">{{ facility.parkingDaysThisMonth | currency: 'USD' }}</h3>
+            </div>
+            <div class="card-footer border-0 p-0 mb-0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="backoffice">
+      <h3>Backoffice</h3>
+      <div class="row">
+        <div class="col-lg-3 col-sm-6">
+          <div class="card card-stats">
+            <div class="card-header card-header-primary card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons">factory</i>
+              </div>
+              <p class="card-category d-flex align-items-center gap-1 m-0" style="white-space: nowrap;">
+                <span style="line-height: 1; font-size: 14px;">Facilities</span>
+                <span class="d-flex align-items-center" style="height: 16px;">
+                  <i class="material-icons" matTooltip="Count of active status facilities" matTooltipPosition="above"
+                    style="font-size: 16px;color: #9e37b4; cursor: pointer; line-height: 1; display: inline-block; padding-bottom: 1px;padding-top:12px;">info</i>
+                </span>
+              </p>
+
+
+
+              <h3 class="card-title">
+                <small class="mr-4" [ngClass]="backoffice.facilities.change < 0 ? 'text-danger' : 'text-success'">
+                  {{ backoffice.facilities.change | percent }}
+                  <span class="material-icons" style="font-size: 14px">{{ backoffice.facilities.change > 0 ? 'north' :
+                    'south' }}</span>
+                </small>
+                <span class="font-weight-bold">{{ backoffice.facilities.current | number }}</span>
+              </h3>
+            </div>
+            <div class="card-footer border-0 p-0 mb-0">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="card card-stats">
+            <div class="card-header card-header-secondary card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons">cloud_circle</i>
+              </div>
+              <p class="card-category d-flex align-items-center gap-1 m-0" style="white-space: nowrap;">
+                <span style="line-height: 1; font-size: 14px;">Hosts</span>
+                <span class="d-flex align-items-center" style="height: 16px;">
+                  <i class="material-icons" matTooltip="Count of active hosts" matTooltipPosition="above"
+                    style="font-size: 16px; cursor: pointer; line-height: 1; display: inline-block; padding-bottom: 1px;padding-top:12px;">info</i>
+                </span>
+              </p>
+              <h3 class="card-title">
+                <small class="mr-4" [ngClass]="backoffice.hosts.change < 0 ? 'text-danger' : 'text-success'">
+                  {{ backoffice.hosts.change | percent }}
+                  <span class="material-icons" style="font-size: 14px">{{ backoffice.hosts.change > 0 ? 'north' :
+                    'south' }}</span>
+                </small>
+                <span class="font-weight-bold">{{ backoffice.hosts.current | number }}</span>
+              </h3>
+            </div>
+            <div class="card-footer border-0 p-0 mb-0">
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+          <div class="card card-stats">
+            <div class="card-header card-header-danger card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons">subscriptions</i>
+              </div>
+              <p class="card-category d-flex align-items-center gap-1 m-0" style="white-space: nowrap;">
+                <span style="line-height: 1; font-size: 12px;">Subscriptions</span>
+                <span class="d-flex align-items-center" style="height: 16px;">
+                  <i class="material-icons" matTooltip="Count of active vehicle subscriptions"
+                    matTooltipPosition="above"
+                    style="font-size: 16px; color: red; cursor: pointer; line-height: 1; display: inline-block; padding-bottom: 1px;padding-top:12px;padding-right: 30px;">info</i>
+                </span>
+              </p>
+              <h3 class="card-title">
+                <small class="mr-4" [ngClass]="backoffice.fastPasses.change < 0 ? 'text-danger' : 'text-success'">
+                  {{ backoffice.fastPasses.change | percent }}
+                  <span class="material-icons" style="font-size: 14px">{{ backoffice.fastPasses.change > 0 ? 'north' :
+                    'south' }}</span>
+                </small>
+                <span class="font-weight-bold">{{ backoffice.fastPasses.current | number }}</span>
+              </h3>
+            </div>
+            <div class="card-footer border-0 p-0 mb-0">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="card card-stats">
+            <div class="card-header card-header-success card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons">Unlimited</i>
+              </div>
+
+              <p class="card-category d-flex align-items-center gap-1 m-0" style="white-space: nowrap;">
+                <span style="line-height: 1; font-size: 14px;">Unlimited</span>
+                <span class="d-flex align-items-center" style="height: 16px;">
+                  <i class="material-icons" matTooltip="Count of active unlimited subscriptions"
+                    matTooltipPosition="above"
+                    style="font-size: 16px;color: green; cursor: pointer; line-height: 1; display: inline-block; padding-bottom: 1px;padding-top:12px;">info</i>
+                </span>
+              </p>
+              <h3 class="card-title">
+                <small class="mr-4" [ngClass]="backoffice.unlimiteds.change < 0 ? 'text-danger' : 'text-success'">
+                  {{ backoffice.unlimiteds.change | percent }}
+                  <span class="material-icons" style="font-size: 14px">{{ backoffice.unlimiteds.change > 0 ? 'north' :
+                    'south' }}</span>
+                </small>
+                <span class="font-weight-bold">{{ backoffice.unlimiteds.current | number }}</span>
+              </h3>
+            </div>
+            <div class="card-footer border-0 p-0 mb-0">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-category d-flex justify-content-between  m-0" style="white-space: nowrap;">
+                <!-- Label -->
+                <span style="line-height: 1; color: #ffa726; font-size: 14px;">Last 30 Days Activity</span>
+
+                <!-- Tooltip Icon on the right -->
+                <span class="d-flex align-items-center" style="height: 16px;">
+                  <i class="material-icons" matTooltip="Last 30 Days Activity"
+                    matTooltipPosition="above"
+                    style="font-size: 16px; color: #ffa726; cursor: pointer; line-height: 1; display: inline-block; padding-bottom: 1px; ">
+                    info
+                  </i>
+                </span>
+              </h4>
+
+
+            </div>
+            <div class="card-body">
+              <app-chart [series]="series" [xaxis]="xaxis"></app-chart>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

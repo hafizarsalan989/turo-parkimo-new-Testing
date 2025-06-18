@@ -1,0 +1,365 @@
+<!-- <style>
+  .small-toggle-group {
+    height: 30px;
+    font-size: 12px;
+
+    ::ng-deep .mat-button-toggle-button {
+      padding: 2px 10px;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    ::ng-deep .mat-button-toggle-label-content {
+      padding: 0;
+    }
+
+    .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+      line-height: 5px;
+    }
+
+
+
+
+    .host-toggle {
+      background-color: white;
+      color: #000;
+    }
+
+    .vehicle-toggle {
+      background-color: white;
+      color: #000;
+    }
+
+    .mat-button-toggle-checked.host-toggle {
+      background-color: #000;
+      color: white;
+    }
+
+    .mat-button-toggle-checked.vehicle-toggle {
+      background-color: #000;
+      color: white;
+    }
+
+  }
+</style> -->
+
+<style>
+  .ios-toggle-container {
+    display: inline-flex;
+    border-radius: 20px;
+    background: #e0e0e0;
+    padding: 4px;
+    position: relative;
+    width: 120px;
+    justify-content: space-between;
+
+    span {
+      /* padding: 6px 16px; */
+      font-size: 12px;
+      cursor: pointer;
+      z-index: 1;
+      color: #555;
+      transition: color 0.3s;
+      border-radius: 16px;
+      flex: 1;
+      text-align: center;
+
+      &.active {
+        color: white;
+        font-weight: 600;
+      }
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      height: calc(100% - 8px);
+      background: #000;
+      border-radius: 16px;
+      transition: transform 0.3s ease;
+      z-index: 0;
+    }
+
+    &[data-active="vehicle"]::after {
+      transform: translateX(100%);
+    }
+
+    &[data-active="host"]::after {
+      transform: translateX(0);
+    }
+  }
+</style>
+<div>
+  <nav #navbar class="navbar navbar-expand-lg navbar-transparent navbar-absolute">
+    <div class="container-fluid bg-white shadow-sm mx-4 rounded px-3 py-1">
+      <div class="navbar-wrapper d-flex align-items-center">
+        <!-- Sidebar Minimize Button -->
+        <div class="navbar-minimize mr-3">
+          <button style="box-shadow: none !important;" mat-raised-button (click)="minimizeSidebar()"
+            class="btn btn-white btn-fab btn-round shadow-sm">
+            <i class="material-icons text_align-center visible-on-sidebar-regular"
+              style=" color: #15cbfe;">more_vert</i>
+            <i class="material-icons design_bullet-list-67 visible-on-sidebar-mini"
+              style="color: #15cbfe;">view_list</i>
+          </button>
+        </div>
+
+        <!-- Breadcrumb / Route Titles -->
+        <!-- <div class="d-none d-md-block">
+          <a *ngFor="let child of getCurrentRoute(); let last = last"
+            class="navbar-brand mx-0 font-weight-bold text-dark " style="font-size: 14px;" [routerLink]="child.path">
+            {{ child.title | titlecase }}
+            <span *ngIf="!last" class="px-2 text-secondary">›</span>
+          </a>
+        </div> -->
+        <!-- ✅ Desktop View -->
+        <div *ngIf="userRole === 'backoffice'" class="d-none d-md-flex align-items-center w-100  flex-wrap">
+
+          <!-- Breadcrumb / Route Titles -->
+          <div class="d-flex align-items-center">
+            <a *ngFor="let child of getCurrentRoute(); let last = last"
+              class="navbar-brand mx-0 font-weight-bold text-dark" style="font-size: 14px;" [routerLink]="child.path">
+              {{ child.title | titlecase }}
+              <span *ngIf="!last" class="px-2 text-secondary">›</span>
+            </a>
+          </div>
+          <!-- Show on md only -->
+          <li class="nav-item d-none d-md-flex d-lg-none align-items-center  w-100" style="column-gap: 10px;">
+            <div class="ios-toggle-container" [attr.data-active]="searchMode">
+              <span [class.active]="searchMode === 'host'" (click)="searchMode = 'host'; onModeChange()">Host</span>
+              <span [class.active]="searchMode === 'vehicle'"
+                (click)="searchMode = 'vehicle'; onModeChange()">Vehicle</span>
+            </div>
+
+            <!-- Host Search -->
+            <form *ngIf="searchMode === 'host'" [formGroup]="form" (submit)="submitHostSearch()"
+              class="d-flex align-items-center w-80">
+              <mat-form-field class="mr-2 mb-0 flex-grow-1" appearance="fill">
+                <input matInput formControlName="searchCriteria" placeholder="Search" />
+              </mat-form-field>
+              <button mat-raised-button type="submit" color="primary"
+                class="btn btn-success btn-sm mb-1">Search</button>
+            </form>
+
+            <!-- Vehicle Search -->
+            <form *ngIf="searchMode === 'vehicle'" [formGroup]="advancedForm" (submit)="submitVehicleSearch()"
+              class="d-flex align-items-center w-80">
+              <mat-form-field class="mr-2 mb-0 flex-grow-1" appearance="fill">
+                <input matInput formControlName="query" placeholder="Tag ID / VIN / Plate" />
+              </mat-form-field>
+              <button mat-raised-button type="submit" color="primary"
+                class="btn btn-success btn-sm mb-1">Search</button>
+            </form>
+          </li>
+        </div>
+      </div>
+
+
+
+      <!-- Mobile Toggle -->
+      <button mat-button class="navbar-toggler btn-no-ripple py-2" type="button" (click)="sidebarToggle()">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="navbar-toggler-icon icon-bar"></span>
+        <span class="navbar-toggler-icon icon-bar"></span>
+        <span class="navbar-toggler-icon icon-bar"></span>
+      </button>
+
+      <!-- Mobile View Search (sm and below) -->
+      <div *ngIf="userRole === 'backoffice'" class="d-lg-none d-md-none w-100">
+        <!-- Toggle Group -->
+        <div class="mb-2">
+          <div class="ios-toggle-container" [attr.data-active]="searchMode">
+            <span [class.active]="searchMode === 'host'" (click)="searchMode = 'host'; onModeChange()">Host</span>
+            <span [class.active]="searchMode === 'vehicle'"
+              (click)="searchMode = 'vehicle'; onModeChange()">Vehicle</span>
+          </div>
+        </div>
+
+        <!-- Host Search -->
+        <form *ngIf="searchMode === 'host'" [formGroup]="form" (submit)="submitHostSearch()" class="mb-2">
+          <!-- Row 1: Input Field -->
+          <div class="mb-2">
+            <mat-form-field class="w-100" appearance="fill">
+              <input matInput formControlName="searchCriteria" placeholder="Search" />
+            </mat-form-field>
+          </div>
+
+          <!-- Row 2: Button -->
+          <div class="mb-2">
+            <button mat-raised-button type="submit" color="primary" class="btn btn-success btn-sm w-20">
+              Search
+            </button>
+          </div>
+        </form>
+
+
+        <!-- Vehicle Search -->
+        <form *ngIf="searchMode === 'vehicle'" [formGroup]="advancedForm" (submit)="submitVehicleSearch()" class="mb-2">
+          <div class="mb-2">
+            <mat-form-field class="w-100" appearance="fill">
+              <input matInput formControlName="query" placeholder="Tag ID / VIN / Plate" />
+            </mat-form-field>
+          </div>
+          <div class="mb-2">
+            <button mat-raised-button type="submit" color="primary" class="btn btn-success btn-sm w-20">
+              Search
+            </button>
+          </div>
+        </form>
+      </div>
+
+
+      <div class="collapse navbar-collapse justify-content-between align-items-center" id="navigation">
+        <div class="d-flex flex-grow-1 justify-content-center">
+          <!-- Centered Search Section -->
+          <div *ngIf="userRole === 'backoffice'" class="d-flex align-items-center" style="column-gap: 10px;">
+            <div class="ios-toggle-container" [attr.data-active]="searchMode">
+              <span [class.active]="searchMode === 'host'" (click)="searchMode = 'host'; onModeChange()">Host</span>
+              <span [class.active]="searchMode === 'vehicle'"
+                (click)="searchMode = 'vehicle'; onModeChange()">Vehicle</span>
+            </div>
+
+            <!-- Host Search -->
+            <form *ngIf="searchMode === 'host'" [formGroup]="form" (submit)="submitHostSearch()"
+              class="d-flex align-items-center ml-2">
+              <mat-form-field class="mb-0" appearance="fill">
+                <input matInput formControlName="searchCriteria" placeholder="Search" />
+              </mat-form-field>
+              <button mat-raised-button type="submit" color="primary"
+                class="btn btn-success btn-sm mb-1 ml-1">Search</button>
+            </form>
+
+            <!-- Vehicle Search -->
+            <form *ngIf="searchMode === 'vehicle'" [formGroup]="advancedForm" (submit)="submitVehicleSearch()"
+              class="d-flex align-items-center ml-2">
+              <mat-form-field class="mb-0" appearance="fill">
+                <input matInput formControlName="query" placeholder="Tag ID / VIN / Plate" />
+              </mat-form-field>
+              <button mat-raised-button type="submit" color="primary"
+                class="btn btn-success btn-sm mb-1 ml-1">Search</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right Section: Notification, Help, Profile -->
+        <ul class="navbar-nav d-flex flex-row align-items-center ml-auto" style="column-gap: 15px;">
+          <!-- Notifications -->
+          <li *ngIf="hostMessages.length" class="nav-item dropdown">
+            <a class="nav-link position-relative" href="#" id="messageDropdownMenuLink" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              <i class="material-icons">notifications</i>
+              <span *ngIf="unread" class="badge badge-danger position-absolute" style="top: -4px; right: -6px;">
+                {{ unread }}
+              </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right shadow rounded" aria-labelledby="messageDropdownMenuLink">
+              <a *ngFor="let msg of hostMessages" class="dropdown-item message d-flex align-items-center px-3 py-2"
+                href="#" (click)="openMessage($event, msg)">
+                <i class="material-icons mr-2" [ngClass]="{ 'text-danger': !msg.acknowledged }">
+                  {{ msg.acknowledged ? 'drafts' : 'mail' }}
+                </i>
+                <span [ngClass]="{ 'font-weight-bold': !msg.acknowledged }">{{ msg.subject }}</span>
+              </a>
+            </div>
+          </li>
+
+          <!-- Help -->
+          <li class="nav-item">
+            <a class="nav-link btn btn-sm d-flex align-items-center" href="https://www.parkmycarshare.com/appcontact"
+              target="_blank" style="background-color: transparent; box-shadow: none;">
+              <i class="material-icons" style="font-size: 18px;">help_outline</i>
+            </a>
+          </li>
+
+          <!-- Profile -->
+          <li class="nav-item dropdown">
+            <a class="nav-link d-flex align-items-center" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false" style="gap: 8px;">
+              <i class="material-icons" style="font-size: 24px;">person</i>
+              <span class="d-none d-lg-inline font-weight-bold" style="color: black;">Profile</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right shadow rounded" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item d-flex align-items-center px-3 py-2" routerLink="my-account">
+                <i class="material-icons mr-2" style="font-size: 20px;">account_circle</i> My Account
+              </a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item d-flex align-items-center text-danger px-3 py-2" (click)="logout()">
+                <i class="material-icons mr-2" style="font-size: 20px;">logout</i> Logout
+              </a>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+
+    </div>
+  </nav>
+
+</div>
+
+
+
+<!-- <nav #navbar class="navbar navbar-expand-lg navbar-transparent  navbar-absolute">
+  <div class="container-fluid">
+    <div class="navbar-wrapper">
+      <div class="navbar-minimize">
+        <button mat-raised-button (click)="minimizeSidebar()" class="btn btn-just-icon btn-white btn-fab btn-round">
+          <i class="material-icons text_align-center visible-on-sidebar-regular">more_vert</i>
+          <i class="material-icons design_bullet-list-67 visible-on-sidebar-mini">view_list</i>
+        </button>
+      </div>
+      <div class="d-none d-md-block px-4">
+        <a *ngFor="let child of getCurrentRoute(); let last = last" class="navbar-brand mx-0"
+          [routerLink]="child.path">{{ child.title | titlecase }}<span *ngIf="!last" class="px-2">></span>
+        </a>
+      </div>
+    </div>
+    <button mat-button class="navbar-toggler btn-no-ripple py-3" type="button" (click)="sidebarToggle()">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="navbar-toggler-icon icon-bar"></span>
+      <span class="navbar-toggler-icon icon-bar"></span>
+      <span class="navbar-toggler-icon icon-bar"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navigation">
+      <ul class="navbar-nav">
+        <li *ngIf="hostMessages.length" class="nav-item dropdown">
+          <a class="nav-link" href="#" id="messageDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
+            <i class="material-icons">notifications</i>
+            <span *ngIf="unread" class="notification">{{ unread }}</span>
+            <p>
+              <span class="d-lg-none d-md-block">Messages</span>
+            </p>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="messageDropdownMenuLink">
+            <a *ngFor="let msg of hostMessages" class="dropdown-item message px-2" href="#"
+              (click)="openMessage($event, msg)"><i class="material-icons mr-1"
+                [ngClass]="{'text-danger': !msg.acknowledged}">{{ msg.acknowledged ? 'drafts' :
+                'mail' }}</i><span [ngClass]="{'font-weight-bolder': !msg.acknowledged}">{{ msg.subject }}</span></a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://www.parkmycarshare.com/appcontact" target="_blank">
+            <i class="material-icons">help</i>
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
+            <i class="material-icons">person</i>
+            <p>
+              <span class="d-lg-none d-md-block">Preferences</span>
+            </p>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" routerLink="my-account">My Account</a>
+            <a class="dropdown-item" (click)="logout()">Logout</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav> -->

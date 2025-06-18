@@ -1,0 +1,62 @@
+<div class="modal fade" id="vehicleActivityModal" tabindex="-1" role="dialog"
+  aria-labelledby="vehicleActivityModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Activities</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="text-primary">
+              <tr>
+                <th style="width: 20%">Action</th>
+                <th style="width: 25%">Car Park</th>
+                <th style="width: 25%">Kiosk</th>
+                <th style="width: 30%">Date & Time</th>
+                <!-- <th> Gate </th>
+                <th> Light </th>
+                <th> 2 Factor Auth </th>
+                <th> Vehicle Credentials </th>
+                <th> Images </th> -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let activity of activities">
+                <td>{{ activity.action | titlecase }}</td>
+                <td>{{ activity.carParkName | titlecase }}</td>
+                <td>{{ activity.kiosk | titlecase }}</td>
+                <td>{{ activity.stamp | date: 'MM/dd/yyyy hh:mm a' }}</td>
+                <!-- <td>
+                  <span class="flag" [ngClass]="activity.isAllowed ? 'flag-yes' : 'flag-no'">
+                    {{ activity.isAllowed ? 'Yes' : 'No' }}
+                  </span>
+                </td>
+
+                <td>Green</td>
+                <td>Authenticate</td>
+                <td>Authorize</td>
+                <td>
+                  <button mat-button (click)="openImageViewer([
+        { image: 'assets/img/image1.jpg', title: 'Test 1' },
+        { image: 'assets/img/image2.jpg', title: 'Test 2' }
+      ])">
+                    View Images
+                  </button>
+                </td> -->
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+      <app-img-viewer [images]="images" [index]="index" [show]="show" (onClose)="close()"></app-img-viewer>
+    </div>
+  </div>
+</div>

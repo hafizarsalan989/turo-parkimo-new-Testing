@@ -1,0 +1,147 @@
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10 py-5 px-4 bg-white rounded invoice">
+
+      <img [src]="logo" height="48" />
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h4 class="font-weight-bold">{{ title }}</h4>
+          <p>{{ invoiceDetail?.companyAddress.address1 }} {{ invoiceDetail?.companyAddress.address2 }}<br />{{
+            invoiceDetail?.companyAddress.city }}, {{ invoiceDetail?.companyAddress.state }} {{
+            invoiceDetail?.companyAddress.zip }}</p>
+          <p></p>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-6 text-right pr-0 font-weight-normal mb-1">Receipt Number:</div>
+            <div class="col-md-6">{{ invoiceDetail?.invoiceNumber }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0 font-weight-normal mb-1">Status:</div>
+            <div class="col-md-6">{{ invoiceDetail?.status | titlecase }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0 font-weight-normal mb-1">Payment Attempts:</div>
+            <div class="col-md-6">{{ invoiceDetail?.tries }} of {{ invoiceDetail?.maxTries }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <div class="font-weight-bold">Bill To</div>
+          <div>{{ invoiceDetail?.referenceName }}<br />{{ invoiceDetail?.billedToAddress.address1 }} {{
+            invoiceDetail?.billedToAddress.address2 }}<br />{{ invoiceDetail?.billedToAddress.city }}, {{
+            invoiceDetail?.billedToAddress.state }} {{ invoiceDetail?.billedToAddress.zip }}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Receipt Date:</div>
+            <div class="col-md-6">{{ invoiceDetail?.invoiceDate | date: 'MM/dd/yyyy hh:mm a' }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Payment Date:</div>
+            <div class="col-md-6">{{ invoiceDetail?.paymentDate | date: 'MM/dd/yyyy hh:mm a' }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">CC Number:</div>
+            <div class="col-md-6">{{ invoiceDetail?.paymentMethod }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Amount Paid(CC):</div>
+            <div class="col-md-6">{{ invoiceDetail?.amountPaidCC | currency: 'USD' }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Amount Paid(Fuel):</div>
+            <div class="col-md-6">{{ invoiceDetail?.amountPaidPMCSBank | currency: 'USD' }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Total Amount Paid:</div>
+            <div class="col-md-6">{{ invoiceDetail?.totalPaid | currency: 'USD' }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Amount Refunded(CC):</div>
+            <div class="col-md-6">{{ invoiceDetail?.amountRefundCC | currency: 'USD' }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Amount Refunded(Fuel):</div>
+            <div class="col-md-6">{{ invoiceDetail?.amountRefundPMCSBank | currency: 'USD' }}</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-right pr-0">Total Amount Refunded:</div>
+            <div class="col-md-6">{{ invoiceDetail?.totalRefund | currency: 'USD' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive mt-4">
+        <table class="table">
+          <thead class="text-primary">
+            <tr>
+              <th>Description</th>
+              <th style="width: 15%">Quantity</th>
+              <th class="text-right" style="width: 15%">Base Amount</th>
+              <th class="text-right" style="width: 15%">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of invoiceDetail?.products">
+              <td>
+                <div *ngIf="product.description">{{ product.description }}</div>
+                <small>
+                  <em>
+                    <div *ngIf="product.feeDescription">Fees: {{ product.feeDescription }}</div>
+                    <div *ngIf="product.discountDescription">Discounts: {{ product.discountDescription }}</div>
+                    <div *ngIf="product.prorationDescription">Proration: {{ product.prorationDescription }}</div>
+                  </em>
+                </small>
+              </td>
+              <td class="align-top">{{ product.quantity | number }}</td>
+              <td class="text-right align-top">{{ product.rate | currency: 'USD' }}</td>
+              <td class="text-right align-top">{{ product.amount | currency: 'USD' }}</td>
+            </tr>
+            <tr>
+              <td [colSpan]="2"></td>
+              <td class="text-right font-weight-bold">Total</td>
+              <td class="text-right font-weight-bold">{{ invoiceDetail?.totalAmount | currency: 'USD' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="row justify-content-end">
+        <div class="col-md-auto">
+          <p class="font-weight-bold">Thank you!</p>
+          <p>If you have any issues contact at<br /><a [href]="'mailto:' + invoiceDetail?.supportEmail">{{
+              invoiceDetail?.supportEmail }}</a></p>
+        </div>
+      </div>
+
+      <div *ngIf="invoiceDetail?.refunds.length > 0" class="table-responsive mt-4">
+        <h4 class="font-weight-bold">Refunds</h4>
+        <table class="table">
+          <thead class="text-primary">
+            <tr>
+              <th style="width: 20%">Date</th>
+              <th style="width: 20%">Amount</th>
+              <th style="width: 20%">Refund Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let refund of invoiceDetail?.refunds">
+              <ng-container *ngIf="refund.isRefunded || refund.isVoided">
+                <td>{{ refund.created | date }}</td>
+                <td>{{ refund.amount | currency: 'USD' }}</td>
+                <td>{{ refund.refundType }}</td>
+                <td>{{ refund.reason }}</td>
+              </ng-container>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<div class="row align-items-baseline">
+  <div *ngIf="showSearch" class="col-md-auto col-12">
+    <mat-form-field appearance="fill">
+      <input [formControl]="searchTermCtrl" matInput placeholder="Search...">
+    </mat-form-field>
+  </div>
+  <div class="col-md">
+    <ng-content select="[action]"></ng-content>
+  </div>
+</div>
+<div class="table-responsive">
+  <table mat-table [dataSource]="dataSource" matSort class="table">
+    <ng-container *ngFor="let col of columnDefs" [matColumnDef]="col.field">
+      <ng-container *ngIf="col.field !== 'actions';else actionsColumn">
+        <th *matHeaderCellDef mat-header-cell mat-sort-header [disabled]="col.disabled" [ngClass]="getClasses(col)">
+          {{col.title}}</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container [ngSwitch]="col.format?.type">
+            <ng-container *ngSwitchCase="'date'">{{row[col.field] | date: col.format?.param ??
+              'MM/dd/yyyy'}}</ng-container>
+            <div *ngSwitchCase="'number'" class="w-100 text-right pr-4">{{row[col.field] | number: col.format?.param}}
+            </div>
+            <div *ngSwitchCase="'currency'" class="w-100 text-right pr-4">{{row[col.field] | currency:
+              col.format?.param}}</div>
+            <ng-container *ngSwitchCase="'link'">
+              <ng-container *ngIf="row.referenceType !== 'Referral Activity'; else plainText">
+                <span class="link" (click)="openLink(col.format?.param, row)">
+                  {{ row[col.field] }}
+                  <i class="material-icons text-info">open_in_new</i>
+                </span>
+              </ng-container>
+              <ng-template #plainText>
+                <span>{{ row[col.field] }}</span>
+              </ng-template>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'length'">{{(row[col.field].length) | number:
+              col.format?.param}}</ng-container>
+            <ng-container *ngSwitchCase="'percent'">{{row[col.field] | number: col.format?.param}}%</ng-container>
+            <span *ngSwitchCase="'html'" [innerHtml]="row[col.field]"></span>
+            <div *ngSwitchCase="'files'">
+              <div *ngFor="let file of row[col.field]" class="d-flex align-items-center mb-2 mr-3">
+                <i class="material-icons mr-1">attachment</i>
+                <span class="ml-2 mr-3 name">{{file.name}}</span>
+                <i class="material-icons icon-download" title="Download File" (click)="onDownload(file)">download</i>
+              </div>
+            </div>
+            <ng-container *ngSwitchDefault>{{row[col.field]}}</ng-container>
+          </ng-container>
+        </td>
+        <td mat-footer-cell *matFooterCellDef>
+          <ng-container *ngIf="col.showFooter">
+            <ng-container [ngSwitch]="col.format?.type">
+              <div *ngSwitchCase="'number'" class="w-100 text-right pr-4 font-weight-bold text-success">{{ getTotal(col)
+                | number: col.format?.param}}
+              </div>
+              <div *ngSwitchCase="'currency'" class="w-100 text-right pr-4 font-weight-bold text-success">{{
+                getTotal(col) | currency:
+                col.format?.param}}</div>
+            </ng-container>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <ng-template #actionsColumn>
+        <th *matHeaderCellDef mat-header-cell></th>
+        <td mat-cell *matCellDef="let row" class="td-actions">
+          <ng-content *ngTemplateOutlet="tdActions; context: { row }"></ng-content>
+        </td>
+      </ng-template>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell text-center" [colSpan]="columns.length">No data matching</td>
+    </tr>
+
+    <ng-container *ngIf="showFooterRow">
+      <tr mat-footer-row *matFooterRowDef="columns; sticky: true" [hidden]="!dataSource.data.length"></tr>
+    </ng-container>
+  </table>
+</div>
+
+<mat-paginator *ngIf="showPagination" [length]="totalRows" [pageSizeOptions]="pageSizeOptions"
+  [showFirstLastButtons]="true" aria-label="Select page of dataSource"></mat-paginator>

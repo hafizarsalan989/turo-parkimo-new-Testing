@@ -1,0 +1,84 @@
+<!-- <footer class="footer ">
+  <div class="container-fluid">
+    <div class="copyright" style="margin-left: 15px;">
+      &copy;
+      {{ year | date: 'yyyy' }}, {{ siteName }}
+    </div>
+    <nav class="urls">
+      <ul>
+        <li>
+          <a href="mailto:info@ParkMyCarShare.com">
+            Contact Us
+          </a>
+        </li>
+        <li>
+          <a href="https://parkmyshare.com/terms" target="_blank">
+            Terms of Service
+          </a>
+        </li>
+        <li>
+          <a href="https://www.parkmycarshare.com/privacypolicy" target="_blank">
+            Privacy Policy
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</footer> -->
+<style>
+  .footer-link {
+    text-decoration: none;
+    color: #6c757d;
+    font-size: 13px;
+    transition: color 0.2s ease-in-out;
+    padding: 5px;
+  }
+
+  .footer-link:hover {
+    color: #000000;
+    text-decoration: underline;
+  }
+
+  .footer {
+    background-color: white !important;
+    border-top: 1px solid #dee2e6 !important;
+    height: auto;
+  }
+
+  .footer-text {
+    font-size: 14px;
+    color: #6c757d;
+  }
+
+  @media (max-width: 768px) {
+    .footer-links {
+      text-align: center;
+      margin-top: 10px;
+    }
+  }
+</style>
+
+<footer class="footer py-3 mt-auto rounded mx-4">
+  <div class="container-fluid">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+      
+      <!-- Left Section -->
+      <div class="footer-text text-center text-md-left mb-2 mb-md-0">
+        &copy; {{ year | date: 'yyyy' }}, {{ siteName }}
+      </div>
+      
+      <!-- Right Section -->
+      <ul class="list-inline footer-links mb-0 text-center text-md-right">
+        <li class="list-inline-item">
+          <a class="footer-link" href="mailto:info@ParkMyCarShare.com">Contact Us</a>
+        </li>
+        <li class="list-inline-item">
+          <a class="footer-link" href="https://parkmyshare.com/terms" target="_blank">Terms of Service</a>
+        </li>
+        <li class="list-inline-item">
+          <a class="footer-link" href="https://www.parkmycarshare.com/privacypolicy" target="_blank">Privacy Policy</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</footer>

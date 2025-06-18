@@ -1,0 +1,340 @@
+<div class="card-header text-center">
+	<div *ngIf="message" class="alert" [ngClass]="'alert-' + messageType">
+		{{ message }}
+	</div>
+	<div class=" d-flex justify-content-between">
+		<h3 class="card-title my-3">Add Vehicle</h3>
+		<button mat-icon-button (click)="closeDialog()" class="close-btn" aria-label="Close">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+<div class="card-body">
+	<mat-stepper #stepper [orientation]="(stepperOrientation | async)!" [linear]="true" labelPosition="bottom">
+		<mat-step label="Base Vehicle Info" [stepControl]="baseForm">
+			<form [formGroup]="baseForm" class="form-horizontal">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="row">
+							<label class="col-md-4 col-3 col-form-label">Vehicle Name</label>
+							<div class="col-md-8 col-9">
+								<mat-form-field>
+									<input formControlName="name" matInput type="text" />
+									<mat-error *ngIf="baseForm.get('name').hasError('required')" class="ml-1">
+										Vehicle name is <strong>required</strong>
+									</mat-error>
+									<mat-error *ngIf="baseForm.get('name').hasError('minlength')" class="ml-1">
+										Vehicle name should be greater than <strong>5 charactors</strong>
+									</mat-error>
+									<mat-error *ngIf="baseForm.get('name').hasError('duplicateName')" class="ml-1">
+										Vehicle name must be <strong>unique</strong> for this host
+									</mat-error>
+
+								</mat-form-field>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="row">
+							<label class="col-md-4 col-3 col-form-label">VIN</label>
+							<div class="col-md-8 col-9">
+								<div class="row">
+									<div class="col">
+										<mat-form-field>
+											<input formControlName="vin" matInput type="text" />
+											<mat-error *ngIf="baseForm.get('vin').hasError('required')" class="ml-1">
+												VIN is <strong>required</strong>
+											</mat-error>
+										</mat-form-field>
+									</div>
+									<div class="col-auto pl-0">
+										<button mat-raised-button mat-min-fab class="btn btn-info btn-round btn-fab"
+											(click)="searchVehicleDetails($event)">
+											<i class="material-icons">search</i>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="row">
+							<label class="col-md-4 col-3 col-form-label">License Plate #</label>
+							<div class="col-md-8 col-9">
+								<mat-form-field>
+									<input formControlName="licensePlate" matInput type="text" />
+									<mat-error *ngIf="baseForm.get('licensePlate').hasError('required')" class="ml-1">
+										License plate is <strong>required</strong>
+									</mat-error>
+								</mat-form-field>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="row">
+							<label class="col-md-4 col-3 col-form-label">Color</label>
+							<div class="col-md-8 col-9">
+								<mat-form-field>
+									<mat-select formControlName="color">
+										<mat-option *ngFor="let color of colors" [value]="color">
+											{{ color }}
+										</mat-option>
+									</mat-select>
+									<mat-error *ngIf="baseForm.get('color').hasError('required')" class="ml-1">
+										Color is <strong>required</strong>
+									</mat-error>
+								</mat-form-field>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="row">
+							<label class="col-md-4 col-3 col-form-label">License Plate State</label>
+							<div class="col-md-8 col-9">
+								<mat-form-field>
+									<mat-select formControlName="licensePlateState">
+										<mat-option *ngFor="let state of states" [value]="state.code">
+											{{ state.name }}
+										</mat-option>
+									</mat-select>
+									<mat-error *ngIf="baseForm.get('licensePlateState').hasError('required')"
+										class="ml-1">
+										Please select the license plate state
+									</mat-error>
+								</mat-form-field>
+							</div>
+						</div>
+					</div>
+					<div *ngIf="isSearched" class="col-md-6">
+						<div class="row">
+							<label class="col-md-4 col-3 col-form-label">Make</label>
+							<div class="col-md-8 col-9">
+								<mat-form-field class="read-only">
+									<input formControlName="make" matInput type="text" [readonly]="true" />
+								</mat-form-field>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div *ngIf="isSearched" class="col-md-6">
+						<div class="row">
+							<label class="col-md-4 col-3 col-form-label">Model</label>
+							<div class="col-md-8 col-9">
+								<mat-form-field class="read-only">
+									<input formControlName="model" matInput type="text" [readonly]="true" />
+								</mat-form-field>
+							</div>
+						</div>
+					</div>
+					<div *ngIf="isSearched" class="col-md-6">
+						<div class="row">
+							<label class="col-md-4 col-3 col-form-label">Engine</label>
+							<div class="col-md-8 col-9">
+								<mat-form-field class="read-only">
+									<input formControlName="engine" matInput type="text" [readonly]="true" />
+								</mat-form-field>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div *ngIf="isSearched" class="col-md-6">
+						<div class="row">
+							<label class="col-md-4 col-3 col-form-label">Trim</label>
+							<div class="col-md-8 col-9">
+								<mat-form-field class="read-only">
+									<input formControlName="trim" matInput type="text" [readonly]="true" />
+								</mat-form-field>
+							</div>
+						</div>
+					</div>
+					<div *ngIf="isSearched" class="col-md-6">
+						<div class="row">
+							<label class="col-md-4 col-3 col-form-label">Year</label>
+							<div class="col-md-8 col-9">
+								<mat-form-field class="read-only">
+									<input formControlName="year" matInput type="text" [readonly]="true" />
+								</mat-form-field>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+			<div class="text-right">
+				<button mat-button class="btn btn-fill btn-step btn-danger mr-2" (click)="cancel()">Cancel</button>
+				<button mat-buttond class="btn btn-fill btn-step btn-success" [disabled]="baseForm.invalid"
+					(click)="goToImageStep()">Next</button>
+			</div>
+		</mat-step>
+		<mat-step label="Images" [stepControl]="imgForm">
+			<div class="row mt-4">
+				<div class="col-md-6 col-sm-12 text-center">
+					<app-img-picker [editable]="true" imageType="vehicle" legend="Front"
+						(changed)="setVehicleImg('imgFront', $event)"></app-img-picker>
+				</div>
+				<div class="col-md-6 col-sm-12 text-center">
+					<app-img-picker [editable]="true" imageType="vehicle" legend="Rear W/Plate"
+						(changed)="setVehicleImg('imgRearWithPlate', $event)"></app-img-picker>
+				</div>
+			</div>
+			<div class="row justify-content-between">
+				<div class="col-md-auto col-12">
+					<button mat-button matStepperPrevious class="btn btn-fill btn-step btn-info">Back</button>
+				</div>
+				<div class="col-md-auto col-12">
+					<button mat-button class="btn btn-fill btn-step btn-danger mr-2" (click)="cancel()">Cancel</button>
+					<button mat-button class="btn btn-fill btn-step btn-success" [disabled]="imgForm.invalid"
+						(click)="saveVehicle()">Save</button>
+				</div>
+			</div>
+		</mat-step>
+		<mat-step label="Thank you">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="row">
+						<label class="col-md-4 col-3 col-form-label">Name</label>
+						<div class="col-md-8 col-9">
+							<mat-form-field class="read-only">
+								<input [ngModel]="baseForm.value.name" matInput type="text" [readonly]="true" />
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="row">
+						<label class="col-md-4 col-3 col-form-label">VIN</label>
+						<div class="col-md-8 col-9">
+							<mat-form-field class="read-only">
+								<input [ngModel]="baseForm.value.vin" matInput type="text" [readonly]="true" />
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="row">
+						<label class="col-md-4 col-3 col-form-label">Plate</label>
+						<div class="col-md-8 col-9">
+							<mat-form-field class="read-only">
+								<input [ngModel]="baseForm.value.licensePlate" matInput type="text" [readonly]="true" />
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="row">
+						<label class="col-md-4 col-3 col-form-label">Plate State</label>
+						<div class="col-md-8 col-9">
+							<mat-form-field class="read-only">
+								<input [ngModel]="baseForm.value.licensePlateState" matInput type="text"
+									[readonly]="true" />
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="row">
+						<label class="col-md-4 col-3 col-form-label">Color</label>
+						<div class="col-md-8 col-9">
+							<mat-form-field class="read-only">
+								<input [ngModel]="baseForm.value.color" matInput type="text" [readonly]="true" />
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="row">
+						<label class="col-md-4 col-3 col-form-label">Make</label>
+						<div class="col-md-8 col-9">
+							<mat-form-field class="read-only">
+								<input [ngModel]="baseForm.value.make" matInput type="text" [readonly]="true" />
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="row">
+						<label class="col-md-4 col-3 col-form-label">Model</label>
+						<div class="col-md-8 col-9">
+							<mat-form-field class="read-only">
+								<input [ngModel]="baseForm.value.model" matInput type="text" [readonly]="true" />
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="row">
+						<label class="col-md-4 col-3 col-form-label">Engine</label>
+						<div class="col-md-8 col-9">
+							<mat-form-field class="read-only">
+								<input [ngModel]="baseForm.value.engine" matInput type="text" [readonly]="true" />
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="row">
+						<label class="col-md-4 col-3 col-form-label">Trim</label>
+						<div class="col-md-8 col-9">
+							<mat-form-field class="read-only">
+								<input [ngModel]="baseForm.value.trim" matInput type="text" [readonly]="true" />
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="row">
+						<label class="col-md-4 col-3 col-form-label">Year</label>
+						<div class="col-md-8 col-9">
+							<mat-form-field class="read-only">
+								<input [ngModel]="baseForm.value.year" matInput type="text" [readonly]="true" />
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row mt-4">
+				<div class="col-md-6 col-sm-12 text-center">
+					<app-img-picker [url]="imgForm.get('imgFront').value" [editable]="false"
+						legend="Front"></app-img-picker>
+				</div>
+				<div class="col-md-6 col-sm-12 text-center">
+					<app-img-picker [url]="imgForm.get('imgRearWithPlate').value" [editable]="false"
+						legend="Rear W/Plate"></app-img-picker>
+				</div>
+			</div>
+
+			<div class="row justify-content-end">
+				<div class="col-md-auto col-12">
+					<button mat-button class="btn btn-fill btn-step btn-info mr-2" (click)="reset()">Add Another
+						Vehicle</button>
+					<button mat-button class="btn btn-fill btn-step btn-danger" (click)="cancel()">
+						Exit</button>
+				</div>
+			</div>
+		</mat-step>
+	</mat-stepper>
+</div>
+<!-- <div class="main-content">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-9 mr-auto ml-auto">
+				<div class="card">
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</div> -->

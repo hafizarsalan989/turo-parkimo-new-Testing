@@ -1,0 +1,237 @@
+<div class="wrapper wrapper-full-page">
+  <div class="page-header login-page header-filter" filter-color="black">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 ml-auto mr-auto">
+          <form [formGroup]="form" class="form" (submit)="submit()">
+            <div class="card card-login card-hidden">
+              <div class="card-header card-header-primary text-center" [ngClass]="bgPrimaryCSS">
+                <img [src]="logo" height="36" (error)="logo='/assets/img/logo/logo-blue.png'" />
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">person</i>
+                      <input formControlName="firstname" matInput type="text" placeholder="First Name" class="mb-2" />
+                      <mat-error *ngIf="form.get('firstname').hasError('required')" class="ml-1">
+                        First name is <strong>required</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">person</i>
+                      <input formControlName="lastname" matInput type="text" placeholder="Last Name" class="mb-2" />
+                      <mat-error *ngIf="form.get('lastname').hasError('required')" class="ml-1">
+                        Last name is <strong>required</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">email</i>
+                      <input formControlName="email" matInput type="email" placeholder="Email" class="mb-2" />
+                      <mat-error *ngIf="form.get('email').hasError('required')" class="ml-1">
+                        Email is <strong>required</strong>
+                      </mat-error>
+                      <mat-error *ngIf="form.get('email').hasError('pattern')" class="ml-1">
+                        Email is not <strong>valid</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">phone</i>
+                      <input formControlName="phone" matInput type="text" placeholder="Phone" class="mb-2" />
+                      <mat-error *ngIf="form.get('phone').hasError('required')" class="ml-1">
+                        Phone is <strong>required</strong>
+                      </mat-error>
+                      <mat-error *ngIf="form.get('phone').hasError('pattern')" class="ml-1">
+                        Phone is not <strong>valid</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">factory</i>
+                      <input formControlName="companyName" matInput type="text" placeholder="Company Name"
+                        class="mb-2" />
+                      <i matSuffix class="material-icons ml-2" role="button" matTooltipPosition="above"
+                        matTooltip="Company name is important, it will be used to find and identify your company when talking to Park My Car Share and will show up on the receipts you receive.">info</i>
+                      <mat-error *ngIf="form.get('companyName').hasError('required')" class="ml-1">
+                        Company name is <strong>required</strong>
+                      </mat-error>
+                      <mat-error *ngIf="form.get('companyName').hasError('invalidCompanyName')" class="ml-1">
+                        Company name is already in <strong>use</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">place</i>
+                      <input formControlName="companyAddress" matInput type="text" placeholder="Company Address"
+                        class="mb-2" />
+                      <mat-error *ngIf="form.get('companyAddress').hasError('required')" class="ml-1">
+                        Company address is <strong>required</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">location_city</i>
+                      <input formControlName="companyCity" matInput type="text" placeholder="Company City"
+                        class="mb-2" />
+                      <mat-error *ngIf="form.get('companyCity').hasError('required')" class="ml-1">
+                        Company city is <strong>required</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto" class="mt-1">
+                      <i matPrefix class="material-icons mr-2">corporate_fare</i>
+                      <mat-select formControlName="companyState" placeholder="Company State">
+                        <mat-option *ngFor="let state of states" [value]="state.code">
+                          {{ state.name }}
+                        </mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="form.get('companyState').hasError('required')" class="ml-1">
+                        Company state is <strong>required</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">pin</i>
+                      <input formControlName="companyZip" matInput type="text" placeholder="Company Zip" class="mb-2" />
+                      <mat-error *ngIf="form.get('companyZip').hasError('required')" class="ml-1">
+                        Company zip is <strong>required</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">code</i>
+                      <input formControlName="referralCode" matInput type="text" placeholder="Referral Code"
+                        class="mb-2" />
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">lock_outline</i>
+                      <input formControlName="password" matInput type="password" placeholder="Password" class="mb-2" />
+                      <mat-error *ngIf="form.get('password').hasError('required')" class="ml-1">
+                        Password is <strong>required</strong>
+                      </mat-error>
+                      <mat-error *ngIf="form.get('password').hasError('minlength')" class="ml-1">
+                        Password should be more than <strong>6 characters</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">lock_outline</i>
+                      <input formControlName="confirmPassword" matInput type="password" placeholder="Repeat Password"
+                        class="mb-2" [errorStateMatcher]="passwordMatcher" />
+                      <mat-error *ngIf="form.get('confirmPassword').hasError('required')" class="ml-1">
+                        Confirm password is <strong>required</strong>
+                      </mat-error>
+                      <mat-error *ngIf="form.get('confirmPassword').hasError('notSame')" class="ml-1">
+                        Password should be <strong>matched</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">badge</i>
+                      <input formControlName="rentalPlatformUsername" matInput type="text"
+                        placeholder="Rental Platform User Name" class="mb-2" />
+                      <mat-error *ngIf="form.get('rentalPlatformUsername').hasError('required')" class="ml-1">
+                        Rental platform user name is <strong>required</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill" floatLabel="auto">
+                      <i matPrefix class="material-icons mr-2">drive_eta</i>
+                      <input formControlName="vehicleCount" matInput type="number" placeholder="Vehicle Count"
+                        class="mb-2" min="0" (keydown)="onVehicleCountKeydown($event)"
+                        (input)="onVehicleCountInput($event)" />
+                      <mat-error *ngIf="form.get('vehicleCount').hasError('required')" class="ml-1">
+                        Vehicle count is <strong>required</strong>
+                      </mat-error>
+                      <mat-error *ngIf="form.get('vehicleCount').hasError('min')" class="ml-1">
+                        Vehicle count must be <strong>0 or greater</strong>
+                      </mat-error>
+                      <mat-error *ngIf="form.get('vehicleCount').hasError('pattern')" class="ml-1">
+                        Vehicle count must be <strong>integer</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-6">
+                    <mat-form-field appearance="fill">
+                      <i matPrefix class="material-icons mr-2">local_grocery_store</i>
+                      <mat-select formControlName="market" placeholder="Market">
+                        <mat-option *ngFor="let market of markets" [value]="market">
+                          {{ market }}
+                        </mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="form.get('market').hasError('required')" class="ml-1">
+                        Market is <strong>required</strong>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-12">
+                    <mat-checkbox formControlName="agrreeTos">By signing up, I agree to the
+                      <a href="https://parkmyshare.com/terms" target="_blank">
+                        Terms of Service
+                      </a>
+                    </mat-checkbox>
+                  </div>
+                  <div class="col-md-12">
+                    <mat-checkbox formControlName="allowSms">Opt in for SMS Messages</mat-checkbox>
+                    <div class="ml-4">
+                      <small>
+                        <em>This allows PMCS to use SMS for system notifications, authentication, marketing, and
+                          information. You can opt out at any time be responding stop to a message or unchecking 'opt in
+                          to SMS' under user settings.</em>
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer d-block text-center px-3 mx-0">
+                <button class="btn btn-primary btn-block" [ngClass]="bgPrimaryCSS" type="submit"
+                  [disabled]="form.invalid || !form.value.agrreeTos || loading">
+                  Sign Up
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm float-right" role="status"
+                    aria-hidden="true"></span>
+                </button>
+                Do you have an account? <a routerLink="/login" class="btn btn-sm btn-link btn-info px-0">Sign In</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer" style="z-index: 999">
+      <div class="container-fluid">
+        <nav>
+          <ul>
+            <li>
+              <a href="https://www.parkmycarshare.com/privacypolicy" target="_blank">
+                Privacy Policy
+              </a>
+            </li>
+            <li>
+              <a href="https://parkmyshare.com/terms" target="_blank">
+                Terms of Service
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+  </div>
+</div>

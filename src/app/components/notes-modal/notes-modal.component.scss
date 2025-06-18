@@ -1,0 +1,15 @@
+.file {
+  max-width: calc(50% - 16px);
+
+  .name {
+    max-width: calc(100% - 50px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.icon-delete {
+  font-size: 1.125rem;
+  cursor: pointer;
+}

@@ -1,0 +1,170 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">Tag Shipping</h3>
+          </div>
+          <div class="card-body">
+            <h4 *ngIf="credentials.length === 0" class="text-center font-weight-bold">No data</h4>
+            <div id="tagMialingAccordion" role="tablist">
+              <div *ngFor="let credential of credentials; index as i; first as isFirst" class="card-collapse">
+                <div class="card-header" role="tab" [id]="'tagMailingHeading' + credential.company.id"
+                  (click)="toggle(credential.company.id)">
+                  <h5 class="mb-0">
+                    <a data-toggle="collapse" [href]="'#tagMailingCollapse' + credential.company.id"
+                      [attr.aria-expanded]="isFirst" [attr.aria-controls]="'tagMailingCollapse' + credential.company.id"
+                      class="collapsed">
+                      {{credential.company.companyName}} ({{credential.tags.length | number}}) <span
+                        class="text-info">{{ credential.shippingOption.name | titlecase }}: {{
+                        credential.shippingOption.price | currency: 'USD' }} ({{credential.oldestRequest |
+                        date:'M/d/yyyy'}})</span>
+                      <i class="material-icons">keyboard_arrow_down</i>
+                    </a>
+                  </h5>
+                </div>
+                <div [id]="'tagMailingCollapse' + credential.company.id" class="collapse" [ngClass]="{'show': isFirst}"
+                  role="tabpanel" [attr.aria-labelledby]="'tagMailingHeading' + credential.company.id"
+                  data-parent="#tagMialingAccordion">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-5">
+                        <h4 class="font-weight-bold text-left">Mailing Address
+                          <i ngxClipboard [cbContent]="fullAddress(credential.company)"
+                            class="material-icons mr-1 text-info clipboard"
+                            title="Copy mailing address">content_copy</i>
+                        </h4>
+                        <div class="row" style="margin-top: 20px;">
+                          <div class="col-md-5 text-left pr-0">
+                            <label>Address1:</label>
+                          </div>
+                          <div class="col-md-7">{{credential.company.mailingAddress.address1}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-5 text-left pr-0">
+                            <label>Address2:</label>
+                          </div>
+                          <div class="col-md-7">{{credential.company.mailingAddress.address2}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-5 text-left pr-0">
+                            <label>Attention:</label>
+                          </div>
+                          <div class="col-md-7">{{credential.company.mailingAddress.attention}}
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-5 text-left pr-0">
+                            <label>City:</label>
+                          </div>
+                          <div class="col-md-7">{{credential.company.mailingAddress.city}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-5 text-left pr-0">
+                            <label>State:</label>
+                          </div>
+                          <div class="col-md-7">{{credential.company.mailingAddress.state}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-5 text-left pr-0">
+                            <label>Zip:</label>
+                          </div>
+                          <div class="col-md-7">{{credential.company.mailingAddress.zip}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-5 text-left pr-0">
+                            <label>Mailing Preference:</label>
+                          </div>
+                          <div class="col-md-7">{{credential.company.mailingPreference | titlecase}}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-5 text-left pr-0">
+                            <label>Email:</label>
+                          </div>
+                          <div class="col-md-7"><i *ngIf="credential.companyOwnerEmail" ngxClipboard
+                              [cbContent]="credential.companyOwnerEmail" class="material-icons mr-1 text-info clipboard"
+                              title="Copy city">content_copy</i>{{credential.companyOwnerEmail}}</div>
+                        </div>
+                      </div>
+                      <div class="col-md-7">
+                        <h4 class="font-weight-bold text-center">Tags</h4>
+                        <div class="row align-items-center">
+                          <div class="col-auto">
+                            Number of Tags: {{credential.tags.length | number}}
+                          </div>
+                          <div class="col-auto">
+                            Start Tag:
+                          </div>
+                          <div class="col">
+                            <mat-form-field>
+                              <input [(ngModel)]="startTags[credential.company.id]" type="number" name="number"
+                                matInput>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-auto">
+                            <button mat-raised-button class="btn btn-success"
+                              [disabled]="!startTags[credential.company.id]"
+                              (click)="fillTag(credential.company.id)">Fill Card</button>
+                          </div>
+                        </div>
+                        <div class="table-responsive">
+                          <table class="table">
+                            <thead class="text-primary">
+                              <tr>
+                                <th>Type</th>
+                                <th>Tag</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngFor="let tag of credential.tags">
+                                <td>{{tag.tagType}}</td>
+                                <td style="width: 150px;">
+                                  <ng-container *ngIf="!tag.tag">{{tag.tag}}</ng-container>
+                                  <input *ngIf="tag.tag" [(ngModel)]="tag.tag" type="number" style="width: 100px;" />
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row align-items-center mt-3">
+                      <div class="col">
+                        <div class="row align-items-center">
+                          <div class="col-auto">
+                            Tracking Link:
+                          </div>
+                          <div class="col-auto">
+                            <mat-form-field>
+                              <input [(ngModel)]="trackingLinks[credential.company.id]" type="text" matInput>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-auto">
+                            <button mat-raised-button class="btn btn-success" [disabled]="!hasAllTag(credential)"
+                              (click)="mail(credential)">Tags Mailed</button>
+                            <button mat-raised-button class="btn btn-danger ml-2" (click)="cancel(credential, i)">Cancel
+                              Order</button>
+                            <button mat-raised-button class="btn btn-primary ml-2"
+                              (click)="onNote(credential)">Notes</button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-auto">
+                        <button mat-raised-button class="btn btn-info mr-2" [disabled]="!hasAllTag(credential)"
+                          (click)="print(credential)">Print Tag
+                          Mailer</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-notes-modal [referenceId]="referenceId" [isPreview]="true" noteType="mailing"></app-notes-modal>

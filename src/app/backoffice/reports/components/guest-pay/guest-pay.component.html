@@ -1,0 +1,77 @@
+<div class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">Guest Pay</h3>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <h4 class="text-center">Summary Report</h4>
+              <table class="table">
+                <thead class="text-primary">
+                  <tr>
+                    <th rowspan="2">Facility</th>
+                    <th>Today</th>
+                    <th>Yesterday</th>
+                    <th colspan="2">Last 7 Days</th>
+                    <th colspan="2">Last 30 Days</th>
+                    <th colspan="2">Last 90 Days</th>
+                  </tr>
+                  <tr>
+                    <th>Total</th>
+                    <th>Total</th>
+                    <th>Total</th>
+                    <th>Daily Avg</th>
+                    <th>Total</th>
+                    <th>Daily Avg</th>
+                    <th>Total</th>
+                    <th>Daily Avg</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of summary">
+                    <td>{{ item.facilityname }}</td>
+                    <td>{{ item.todayTotal | number }}</td>
+                    <td>{{ item.yesterdayTotal | number }}</td>
+                    <td>{{ item.last7DaysTotal | number }}</td>
+                    <td>{{ item.last7DaysAvg | number }}</td>
+                    <td>{{ item.last30DaysTotal | number }}</td>
+                    <td>{{ item.last30DaysAvg | number }}</td>
+                    <td>{{ item.last90DaysTotal | number }}</td>
+                    <td>{{ item.last90DaysAvg | number }}</td>
+                  </tr>
+                  <tr *ngIf="summary.length === 0">
+                    <td colspan="9" class="text-center">No data</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-responsive mt-4">
+              <h4 class="text-center">Daily Report</h4>
+              <table class="table">
+                <thead class="text-primary">
+                  <tr>
+                    <th>Facility</th>
+                    <th *ngFor="let day of daily[0]?.data">{{ day.dayOfWeek }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of daily">
+                    <td>{{ item.facilityname }}</td>
+                    <td *ngFor="let day of item.data">{{ day.total | number }}</td>
+                  </tr>
+                  <tr *ngIf="daily.length === 0">
+                    <td colspan="8" class="text-center">No data</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,1090 @@
+<div class="main-content">
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title text-center mt-3">My Account</h3>
+      </div>
+
+      <div class="card-body">
+        <div id="my-account-accordion" role="tablist">
+          <div class="card-collapse">
+            <div class="card-header" role="tab" id="headingOne">
+              <h5 class="mb-0">
+                <a
+                  data-toggle="collapse"
+                  href="#collapseOne"
+                  aria-expanded="true"
+                  aria-controls="collapseOne"
+                  class="collapsed"
+                >
+                  User Profile
+                  <i class="material-icons">keyboard_arrow_down</i>
+                </a>
+              </h5>
+            </div>
+            <div
+              id="collapseOne"
+              class="collapse show"
+              role="tabpanel"
+              aria-labelledby="headingOne"
+              data-parent="#my-account-accordion"
+            >
+              <div class="card-body">
+                <form [formGroup]="profileForm" (submit)="saveProfile()">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group mt-0">
+                        <label class="mb-0">Fistname</label>
+                        <mat-form-field appearance="fill" floatLabel="auto">
+                          <input
+                            formControlName="firstname"
+                            matInput
+                            type="text"
+                          />
+                          <mat-error
+                            *ngIf="
+                              profileForm.get('firstname').hasError('required')
+                            "
+                            class="ml-1"
+                          >
+                            Firstname is <strong>required</strong>
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group mt-0">
+                        <label class="mb-0">Lastname</label>
+                        <mat-form-field appearance="fill" floatLabel="auto">
+                          <input
+                            formControlName="lastname"
+                            matInput
+                            type="text"
+                          />
+                          <mat-error
+                            *ngIf="
+                              profileForm.get('lastname').hasError('required')
+                            "
+                            class="ml-1"
+                          >
+                            Lastname is <strong>required</strong>
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group mt-0">
+                        <label class="mb-0">Email</label>
+                        <mat-form-field
+                          appearance="fill"
+                          floatLabel="auto"
+                          class="read-only"
+                        >
+                          <input
+                            formControlName="email"
+                            matInput
+                            type="text"
+                            [readonly]="true"
+                          />
+                          <mat-error
+                            *ngIf="
+                              profileForm.get('email').hasError('required')
+                            "
+                            class="ml-1"
+                          >
+                            Email is <strong>required</strong>
+                          </mat-error>
+                          <mat-error
+                            *ngIf="profileForm.get('email').hasError('pattern')"
+                            class="ml-1"
+                          >
+                            Email is not <strong>valid</strong>
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group mt-0">
+                        <label class="mb-0">Phone</label>
+                        <mat-form-field appearance="fill" floatLabel="auto">
+                          <input formControlName="phone" matInput type="text" />
+                          <mat-error
+                            *ngIf="
+                              profileForm.get('phone').hasError('required')
+                            "
+                            class="ml-1"
+                          >
+                            Phone is <strong>required</strong>
+                          </mat-error>
+                          <mat-error
+                            *ngIf="profileForm.get('phone').hasError('pattern')"
+                            class="ml-1"
+                          >
+                            Phone is not <strong>valid</strong>
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                  <div formGroupName="addresses">
+                    <div class="row">
+                      <div class="col-md-7">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Address 1</label>
+                          <mat-form-field appearance="fill" floatLabel="auto">
+                            <input
+                              formControlName="address1"
+                              matInput
+                              type="text"
+                            />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-md-5">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Address 2(Optional)</label>
+                          <mat-form-field appearance="fill" floatLabel="auto">
+                            <input
+                              formControlName="address2"
+                              matInput
+                              type="text"
+                            />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">City</label>
+                          <mat-form-field appearance="fill" floatLabel="auto">
+                            <input
+                              formControlName="city"
+                              matInput
+                              type="text"
+                            />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">State</label>
+                          <mat-form-field>
+                            <mat-select formControlName="state">
+                              <mat-option
+                                *ngFor="let state of states"
+                                [value]="state.code"
+                              >
+                                {{ state.name }}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Zip</label>
+                          <mat-form-field appearance="fill" floatLabel="auto">
+                            <input formControlName="zip" matInput type="text" />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    mat-raised-button
+                    type="submit"
+                    class="btn btn-success pull-right"
+                  >
+                    Update Profile
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="card-collapse">
+            <div class="card-header" role="tab" id="headingTwo">
+              <h5 class="mb-0">
+                <a
+                  class="collapsed"
+                  data-toggle="collapse"
+                  href="#collapseTwo"
+                  aria-expanded="false"
+                  aria-controls="collapseTwo"
+                >
+                  User Password Change
+                  <i class="material-icons">keyboard_arrow_down</i>
+                </a>
+              </h5>
+            </div>
+            <div
+              id="collapseTwo"
+              class="collapse"
+              role="tabpanel"
+              aria-labelledby="headingTwo"
+              data-parent="#my-account-accordion"
+            >
+              <div class="card-body">
+                <form [formGroup]="passwordForm" (submit)="savePassword()">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group mt-0">
+                        <label class="mb-0">New Password</label>
+                        <mat-form-field appearance="fill" floatLabel="auto">
+                          <input
+                            formControlName="password"
+                            matInput
+                            type="password"
+                            placeholder="********"
+                          />
+                          <mat-error
+                            *ngIf="
+                              passwordForm.get('password').hasError('required')
+                            "
+                            class="ml-1"
+                          >
+                            New password is <strong>required</strong>
+                          </mat-error>
+                          <mat-error
+                            *ngIf="
+                              passwordForm.get('password').hasError('minlength')
+                            "
+                            class="ml-1"
+                          >
+                            Password should be more than
+                            <strong>6 characters</strong>
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group mt-0">
+                        <label class="mb-0">Confirm New Password</label>
+                        <mat-form-field appearance="fill" floatLabel="auto">
+                          <input
+                            formControlName="confirmPassword"
+                            matInput
+                            type="password"
+                            placeholder="********"
+                            [errorStateMatcher]="passwordMatcher"
+                          />
+                          <mat-error
+                            *ngIf="
+                              passwordForm
+                                .get('confirmPassword')
+                                .hasError('required')
+                            "
+                            class="ml-1">
+                            Confirm password is <strong>required</strong>
+                          </mat-error>
+                          <mat-error
+                            *ngIf="
+                              passwordForm
+                                .get('confirmPassword')
+                                .hasError('notSame')
+                            "
+                            class="ml-1"
+                          >
+                            Password should be <strong>matched</strong>
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    mat-raised-button
+                    type="submit"
+                    class="btn btn-danger pull-right"
+                    [disabled]="passwordForm.invalid || loadingPassword"
+                  >
+                    Update Password
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          <ng-container *ngIf="isHostAdmin">
+            <div class="card-collapse">
+              <div class="card-header" role="tab" id="headingThree">
+                <h5 class="mb-0">
+                  <a
+                    class="collapsed"
+                    data-toggle="collapse"
+                    href="#collapseThree"
+                    aria-expanded="false"
+                    aria-controls="collapseThree"
+                  >
+                    Company Information
+                    <i class="material-icons">keyboard_arrow_down</i>
+                  </a>
+                </h5>
+              </div>
+              <div
+                id="collapseThree"
+                class="collapse"
+                role="tabpanel"
+                aria-labelledby="headingThree"
+                data-parent="#my-account-accordion"
+              >
+                <div class="card-body">
+                  <form
+                    [formGroup]="companyForm"
+                    (submit)="saveInformation(companyForm.value)"
+                  >
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Company Name</label>
+                          <mat-form-field appearance="fill" floatLabel="auto">
+                            <input
+                              formControlName="companyName"
+                              matInput
+                              type="text"
+                            />
+                            <mat-error
+                              *ngIf="
+                                companyForm
+                                  .get('companyName')
+                                  .hasError('required')
+                              "
+                              class="ml-1"
+                            >
+                              Company name is <strong>required</strong>
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                    <div formGroupName="address">
+                      <div class="row">
+                        <div class="col-md-7">
+                          <div class="form-group mt-0">
+                            <label class="mb-0">Address 1</label>
+                            <mat-form-field appearance="fill" floatLabel="auto">
+                              <input
+                                formControlName="address1"
+                                matInput
+                                type="text"
+                              />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="col-md-5">
+                          <div class="form-group mt-0">
+                            <label class="mb-0">Address 2</label>
+                            <mat-form-field appearance="fill" floatLabel="auto">
+                              <input
+                                formControlName="address2"
+                                matInput
+                                type="text"
+                              />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group mt-0">
+                            <label class="mb-0">City</label>
+                            <mat-form-field appearance="fill" floatLabel="auto">
+                              <input
+                                formControlName="city"
+                                matInput
+                                type="text"
+                              />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group mt-0">
+                            <label class="mb-0">State</label>
+                            <mat-form-field>
+                              <mat-select formControlName="state">
+                                <mat-option
+                                  *ngFor="let state of states"
+                                  [value]="state.code"
+                                >
+                                  {{ state.name }}
+                                </mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group mt-0">
+                            <label class="mb-0">Zip</label>
+                            <mat-form-field appearance="fill" floatLabel="auto">
+                              <input
+                                formControlName="zip"
+                                matInput
+                                type="text"
+                              />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      mat-raised-button
+                      type="submit"
+                      class="btn btn-success pull-right"
+                    >
+                      Update Company
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="card-collapse">
+              <div class="card-header" role="tab" id="headingFour">
+                <h5 class="mb-0">
+                  <a
+                    class="collapsed"
+                    data-toggle="collapse"
+                    href="#collapseFour"
+                    aria-expanded="false"
+                    aria-controls="collapseFour"
+                  >
+                    Company Mailing Address
+                    <i class="material-icons">keyboard_arrow_down</i>
+                  </a>
+                </h5>
+              </div>
+              <div
+                id="collapseFour"
+                class="collapse"
+                role="tabpanel"
+                aria-labelledby="headingFour"
+                data-parent="#my-account-accordion"
+              >
+                <div class="card-body">
+                  <form
+                    [formGroup]="mailingForm"
+                    (submit)="
+                      saveInformation({ mailingAddress: mailingForm.value })
+                    "
+                  >
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Address 1</label>
+                          <mat-form-field appearance="fill" floatLabel="auto">
+                            <input
+                              formControlName="address1"
+                              matInput
+                              type="text"
+                            />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Address 2</label>
+                          <mat-form-field appearance="fill" floatLabel="auto">
+                            <input
+                              formControlName="address2"
+                              matInput
+                              type="text"
+                            />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Attention</label>
+                          <mat-form-field appearance="fill" floatLabel="auto">
+                            <input
+                              formControlName="attention"
+                              matInput
+                              type="text"
+                            />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">City</label>
+                          <mat-form-field appearance="fill" floatLabel="auto">
+                            <input
+                              formControlName="city"
+                              matInput
+                              type="text"
+                            />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">State</label>
+                          <mat-form-field>
+                            <mat-select formControlName="state">
+                              <mat-option
+                                *ngFor="let state of states"
+                                [value]="state.code"
+                              >
+                                {{ state.name }}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Zip</label>
+                          <mat-form-field appearance="fill" floatLabel="auto">
+                            <input formControlName="zip" matInput type="text" />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      mat-raised-button
+                      type="submit"
+                      class="btn btn-success pull-right"
+                    >
+                      Update Mailing Address
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="card-collapse">
+              <div class="card-header" role="tab" id="headingFive">
+                <h5 class="mb-0">
+                  <a
+                    class="collapsed"
+                    data-toggle="collapse"
+                    href="#collapseFive"
+                    aria-expanded="false"
+                    aria-controls="collapseFive"
+                  >
+                    Company Credit Cards
+                    <i class="material-icons">keyboard_arrow_down</i>
+                  </a>
+                </h5>
+              </div>
+              <div
+                id="collapseFive"
+                class="collapse"
+                role="tabpanel"
+                aria-labelledby="headingFive"
+                data-parent="#my-account-accordion"
+              >
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="card">
+                        <div class="card-header border-0 px-4 py-3">
+                          <h6 class="mb-0">Primary Credit Card</h6>
+                        </div>
+                        <div class="card-body">
+                          <h4 class="card-title text-center">
+                            <ng-container *ngIf="primaryCard">
+                              <img
+                                [src]="getIcon(primaryCard.cardType)"
+                                class="mr-1"
+                              /><span class="mr-3">{{
+                                primaryCard.cardMask
+                              }}</span>
+                              <small
+                                >Exp: {{ primaryCard.cardExpiration }}</small
+                              >
+                              <button
+                                mat-raised-button
+                                mat-min-fab
+                                class="btn btn-success btn-link btn-round btn-fab btn-sm ml-3"
+                                title="Change"
+                                (click)="addCreditCard(true)"
+                              >
+                                <i class="material-icons">edit</i>
+                              </button>
+                            </ng-container>
+                            <ng-container *ngIf="!primaryCard">
+                              <button
+                                mat-raised-button
+                                mat-min-fab
+                                class="btn btn-info my-0"
+                                (click)="addCreditCard(true)"
+                              >
+                                <i class="material-icons">add</i>
+                                Add
+                              </button>
+                              <i class="material-icons align-middle ml-3"
+                                >credit_card</i
+                              >
+                            </ng-container>
+                          </h4>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card">
+                        <div class="card-header border-0 px-4 py-3">
+                          <h6 class="mb-0">Secondary Credit Card</h6>
+                        </div>
+                        <div class="card-body">
+                          <h4 class="card-title text-center">
+                            <ng-container *ngIf="secondaryCard">
+                              <img
+                                [src]="getIcon(secondaryCard.cardType)"
+                                class="mr-1"
+                              /><span class="mr-3">{{
+                                secondaryCard.cardMask
+                              }}</span>
+                              <small
+                                >Exp: {{ secondaryCard.cardExpiration }}</small
+                              >
+                              <button
+                                mat-raised-button
+                                mat-min-fab
+                                class="btn btn-info btn-link btn-round btn-fab btn-sm ml-3"
+                                title="Make Primary"
+                                (click)="setToPrimary()"
+                              >
+                                <i class="material-icons">swap_vert</i>
+                              </button>
+                              <button
+                                mat-raised-button
+                                mat-min-fab
+                                class="btn btn-danger btn-link btn-round btn-fab btn-sm"
+                                title="Delete Card"
+                                (click)="deleteCardOnFile(secondaryCard?.id)"
+                              >
+                                <i class="material-icons">delete</i>
+                              </button>
+                            </ng-container>
+                            <ng-container *ngIf="!secondaryCard">
+                              <button
+                                mat-raised-button
+                                mat-min-fab
+                                class="btn btn-info my-0"
+                                (click)="addCreditCard()"
+                              >
+                                <i class="material-icons">add</i>
+                                Add
+                              </button>
+                              <i class="material-icons align-middle ml-3"
+                                >credit_card</i
+                              >
+                            </ng-container>
+                          </h4>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="card-collapse">
+              <div class="card-header" role="tab" id="headingEight">
+                <h5 class="mb-0">
+                  <a
+                    class="collapsed"
+                    data-toggle="collapse"
+                    href="#collapseEight"
+                    aria-expanded="false"
+                    aria-controls="collapseEight"
+                  >
+                    Company ACH
+                    <i class="material-icons">keyboard_arrow_down</i>
+                  </a>
+                </h5>
+              </div>
+              <div
+                id="collapseEight"
+                class="collapse"
+                role="tabpanel"
+                aria-labelledby="headingEight"
+                data-parent="#my-account-accordion"
+              >
+                <div class="card-body">
+                  <p class="text-info">
+                    <em
+                      >ACH info is used for processing Fuel Tank Withdraws from
+                      Guest Invoicing or Refer a Friend activity, we do not use
+                      for paying daily host invoices.</em
+                    >
+                  </p>
+                  <form [formGroup]="achForm" (submit)="saveAch()">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">ABA Number</label>
+                          <mat-form-field>
+                            <input
+                              formControlName="abaNumber"
+                              matInput
+                              type="text"
+                            />
+                            <mat-error
+                              *ngIf="
+                                achForm.get('abaNumber').hasError('required')
+                              "
+                              class="ml-1"
+                            >
+                              ABA(Routing) Number is <strong>required</strong>
+                            </mat-error>
+                            <mat-error
+                              *ngIf="
+                                achForm.get('abaNumber').hasError('pattern')
+                              "
+                              class="ml-1"
+                            >
+                              ABA(Routing) Number should be
+                              <strong>number</strong>
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Account Number</label>
+                          <mat-form-field>
+                            <input
+                              formControlName="accountNumber"
+                              matInput
+                              type="text"
+                            />
+                            <mat-error
+                              *ngIf="
+                                achForm
+                                  .get('accountNumber')
+                                  .hasError('required')
+                              "
+                              class="ml-1"
+                            >
+                              Account Number is <strong>required</strong>
+                            </mat-error>
+                            <mat-error
+                              *ngIf="
+                                achForm.get('accountNumber').hasError('pattern')
+                              "
+                              class="ml-1"
+                            >
+                              ABA(Routing) Number should be
+                              <strong>number</strong>
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Bank Name</label>
+                          <mat-form-field>
+                            <input
+                              formControlName="bankName"
+                              matInput
+                              type="text"
+                            />
+                            <mat-error
+                              *ngIf="
+                                achForm.get('bankName').hasError('required')
+                              "
+                              class="ml-1"
+                            >
+                              Bank Name is <strong>required</strong>
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Account Owner Name</label>
+                          <mat-form-field>
+                            <input
+                              formControlName="accountOwnerName"
+                              matInput
+                              type="text"
+                            />
+                            <mat-error
+                              *ngIf="
+                                achForm
+                                  .get('accountOwnerName')
+                                  .hasError('required')
+                              "
+                              class="ml-1"
+                            >
+                              Account Owner Name Number is
+                              <strong>required</strong>
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group mt-0">
+                          <label class="mb-0">Account Owner Phone</label>
+                          <mat-form-field>
+                            <input
+                              formControlName="accountOwnerPhone"
+                              matInput
+                              type="text"
+                            />
+                            <mat-error
+                              *ngIf="
+                                achForm
+                                  .get('accountOwnerPhone')
+                                  .hasError('required')
+                              "
+                              class="ml-1"
+                            >
+                              Account Owner Phone is <strong>required</strong>
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      mat-raised-button
+                      type="submit"
+                      class="btn btn-success pull-right"
+                    >
+                      Update ACH
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div> -->
+            <div class="card-collapse">
+              <div class="card-header" role="tab" id="headingSeven">
+                <h5 class="mb-0">
+                  <a
+                    class="collapsed"
+                    data-toggle="collapse"
+                    href="#collapseSeven"
+                    aria-expanded="false"
+                    aria-controls="collapseSeven"
+                  >
+                    Guest Pay
+                    <i class="material-icons">keyboard_arrow_down</i>
+                  </a>
+                </h5>
+              </div>
+              <div
+                id="collapseSeven"
+                class="collapse"
+                role="tabpanel"
+                aria-labelledby="headingSeven"
+                data-parent="#my-account-accordion"
+              >
+                <div class="card-body">
+                  <form
+                    *ngIf="host?.allowGuestRegistration"
+                    [formGroup]="invoiceForm"
+                  >
+                    <div class="row" formArrayName="invoices">
+                      <ng-container
+                        *ngFor="let invoice of invoices.controls; let i = index"
+                      >
+                        <div [formGroup]="invoice" class="col-md-6">
+                          <div class="card">
+                            <div class="card-header border-0 px-4 pt-3">
+                              <h5 class="font-weight-bold mb-0">
+                                {{ invoice.get("facilityName").value }}
+                                <small
+                                  *ngIf="
+                                    invoice.value.prevIsEnabled &&
+                                    !invoice.value.isPending
+                                  "
+                                  class="ml-1"
+                                >
+                                  (Guest Pay Link)
+                                </small>
+                              </h5>
+                              <div
+                                *ngIf="
+                                  invoice.value.prevIsEnabled &&
+                                  !invoice.value.isPending
+                                "
+                              >
+                                <small
+                                  ><i
+                                    ngxClipboard
+                                    [cbContent]="
+                                      invoice.get('invoiceUrl').value
+                                    "
+                                    class="material-icons mr-1 text-info clipboard"
+                                    title="Copy nvoice URL"
+                                    >content_copy</i
+                                  >URL:
+                                  {{ invoice.get("invoiceUrl").value }}</small
+                                >
+                              </div>
+                              <hr class="mb-0" />
+                            </div>
+                            <div class="card-body">
+                              <h5
+                                class="d-flex justify-content-center font-weight-bold"
+                              >
+                                Guest Pay
+                              </h5>
+                              <mat-checkbox
+                                class="mr-2"
+                                formControlName="isEnabled"
+                                >Enabled</mat-checkbox
+                              >
+
+                              <div class="mt-3">
+                                <label>Facility Parking Exit Fee: </label>
+                                <span class="h4 ml-1">{{
+                                  invoice.value.travelerInvoiceParkingFee
+                                    | currency : "USD"
+                                }}</span>
+                              </div>
+
+                              <div class="mt-3">
+                                <label>Percent of fee to pass to Guest</label>
+                                <div class="d-flex align-items-center">
+                                  <label class="mb-0"
+                                    >{{
+                                      (invoice.value
+                                        ?.minimumTravelerInvoiceParkingFeePercent ??
+                                        0) *
+                                        100 | number : "1.0-0"
+                                    }}%</label
+                                  >
+                                  <mat-slider
+                                    formControlName="percentPassThrough"
+                                    [min]="
+                                      invoice.value
+                                        .minimumTravelerInvoiceParkingFeePercent
+                                    "
+                                    [max]="1"
+                                    [step]="0.000001"
+                                    thumbLabel
+                                    [displayWith]="formatPercent"
+                                    class="flex-grow-1 mx-1"
+                                  ></mat-slider>
+                                  <label class="mb-0">100%</label>
+                                </div>
+                              </div>
+
+                              <div class="row align-items-center">
+                                <div class="col-md-auto">
+                                  <label
+                                    >Exit Fee Passing Through to Guest:
+                                  </label>
+                                </div>
+                                <div class="col-md">
+                                  <mat-form-field
+                                    appearance="fill"
+                                    floatLabel="auto"
+                                  >
+                                    <span matPrefix>$</span>
+                                    <input
+                                      [value]="invoice.value.parkingFee"
+                                      matInput
+                                      type="number"
+                                      [min]="
+                                        invoice.value
+                                          .minimumTravelerInvoiceParkingFee
+                                      "
+                                      [max]="
+                                        invoice.value.travelerInvoiceParkingFee
+                                      "
+                                      (change)="
+                                        onChangeParkingFee($event, invoice)
+                                      "
+                                    />
+                                  </mat-form-field>
+                                </div>
+                              </div>
+
+                              <div formArrayName="tripCharges" class="mt-3">
+                                <label>Trip Fees: </label>
+                                <span
+                                  *ngIf="
+                                    invoice.get('tripCharges').controls
+                                      .length === 0
+                                  "
+                                  class="h4 ml-1"
+                                  >{{ 0 | currency : "USD" }}</span
+                                >
+                                <ng-container
+                                  *ngFor="
+                                    let tripCharge of invoice.get('tripCharges')
+                                      .controls;
+                                    let j = index
+                                  "
+                                >
+                                  <div
+                                    [formGroup]="tripCharge"
+                                    class="ml-3 mt-1"
+                                  >
+                                    <label>{{ tripCharge.value.name }}: </label>
+                                    <span class="ml-1">{{
+                                      tripCharge.value.amount | currency : "USD"
+                                    }}</span>
+                                  </div>
+                                </ng-container>
+                              </div>
+
+                              <div class="font-weight-bold">
+                                Total Guest Charged:
+                                <span class="h3 ml-1">{{
+                                  totalCharge(invoice) | currency : "USD"
+                                }}</span>
+                              </div>
+
+                              <div class="pull-right">
+                                <a
+                                  *ngIf="
+                                    invoice.value.prevIsEnabled &&
+                                    !invoice.value.isPending
+                                  "
+                                  mat-raised-button
+                                  type="button"
+                                  class="btn btn-warning btn-link mr-2"
+                                  [href]="invoice.get('invoiceUrl').value"
+                                  target="_blank"
+                                >
+                                  Pay Guest Invoice
+                                </a>
+                                <button
+                                  type="submit"
+                                  mat-raised-button
+                                  class="btn btn-info"
+                                  [disabled]="invoice.invalid"
+                                  (click)="onSave(invoice.value, i)"
+                                >
+                                  Save
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </form>
+
+                  <div
+                    *ngIf="!host?.allowGuestRegistration"
+                    class="alert alert-danger"
+                  >
+                    <p class="mb-0">
+                      Registration is not enabled for this link, please contact
+                      your Host.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-credit-card-modal
+  *ngIf="creditCardModalId"
+  [modalId]="creditCardModalId"
+  [gateway]="gateway"
+  (saved)="saveCardOnFile($event)"
+  (canceled)="creditCardModalId = ''"
+></app-credit-card-modal>

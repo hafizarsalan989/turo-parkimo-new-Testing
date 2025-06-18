@@ -1,0 +1,144 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center mt-3">Device Monitoring</h3>
+          </div>
+          <div class="card-body">
+            <div id="deviceMonitoringAccordion" role="tablist">
+              <div *ngFor="let report of reports; first as isFirst" class="card-collapse">
+                <div class="card-header" role="tab" [id]="'heading' + report.facilityId">
+                  <h5 class="mb-0">
+                    <a data-toggle="collapse" [href]="'#collapse' + report.facilityId" [attr.aria-expanded]="isFirst"
+                      [attr.aria-controls]="'collapse' + report.facilityId" class="collapsed">
+                      {{ report.facilityName }}
+                      <i class="material-icons">keyboard_arrow_down</i>
+                    </a>
+                  </h5>
+                </div>
+                <div [id]="'collapse' + report.facilityId" class="collapse" [ngClass]="{ 'show': isFirst }"
+                  role="tabpanel" [attr.aria-labelledby]="'heading' + report.facilityId"
+                  data-parent="#deviceMonitoringAccordion">
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table">
+                        <thead class="text-primary">
+                          <tr>
+                            <th rowspan="2">Device Name</th>
+                            <th rowspan="2">Device Type</th>
+                            <th rowspan="2">Action</th>
+                            <th rowspan="2">Date</th>
+                            <th rowspan="2">Hour</th>
+                            <th colspan="2">Same Last Week</th>
+                            <th colspan="2">Same Last Month</th>
+                            <th colspan="2">24 Hours</th>
+                            <th colspan="2">Week</th>
+                            <th colspan="2">2 Weeks</th>
+                            <th colspan="2">Month</th>
+                            <th rowspan="2">Action</th>
+                          </tr>
+                          <tr>
+                            <th>Total</th>
+                            <th>Hourly Avg</th>
+                            <th>Total</th>
+                            <th>Hourly Avg</th>
+                            <th>Total</th>
+                            <th>Hourly Avg</th>
+                            <th>Total</th>
+                            <th>Hourly Avg</th>
+                            <th>Total</th>
+                            <th>Hourly Avg</th>
+                            <th>Total</th>
+                            <th>Hourly Avg</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let device of report.devices">
+                            <td>{{ device.deviceName }}</td>
+                            <td>{{ device.deviceType }}</td>
+                            <td>{{ device.action }}</td>
+                            <td>{{ device.date | date: 'MM/dd/YYYY' }}</td>
+                            <td>{{ ('' + device.dateTimeDimensionKey).slice(-2) }}</td>
+                            <td>{{ device.sameLastWeek.total | number }}</td>
+                            <td>{{ device.sameLastWeek.hourlyAverage | number }}</td>
+                            <td>{{ device.sameLastMonth.total | number }}</td>
+                            <td>{{ device.sameLastMonth.hourlyAverage | number }}</td>
+                            <td>{{ device.day.total | number }}</td>
+                            <td>{{ device.day.hourlyAverage | number }}</td>
+                            <td>{{ device.week.total | number }}</td>
+                            <td>{{ device.week.hourlyAverage | number }}</td>
+                            <td>{{ device.twoWeeks.total | number }}</td>
+                            <td>{{ device.twoWeeks.hourlyAverage | number }}</td>
+                            <td>{{ device.month.total | number }}</td>
+                            <td>{{ device.month.hourlyAverage | number }}</td>
+                            <td class="td-actions">
+                              <button mat-raised-button type="button" class="btn btn-info mx-1"
+                                title="View Last 24 Hours Activities" (click)="viewActivities(device.details)">
+                                <i class="material-icons">visibility</i>
+                              </button>
+                            </td>
+                          </tr>
+                          <tr *ngIf="report.devices.length === 0">
+                            <td colspan="18" class="text-center">No data</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deviceActivityModal" tabindex="-1" role="dialog" aria-labelledby="deviceActivityModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Last 24 Hours Activities</h4>
+        <button mat-button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="material-icons">clear</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="text-primary">
+              <tr>
+                <th>Facility</th>
+                <th>Device Name</th>
+                <th>Device Type</th>
+                <th>Vehicle</th>
+                <th>Tag</th>
+                <th>Date</th>
+                <th>Hour</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let activity of activities">
+                <td>{{ activity.facilityName }}</td>
+                <td>{{ activity.deviceName }}</td>
+                <td>{{ activity.devicyeType }}</td>
+                <td>{{ activity.vehicleName }}</td>
+                <td>{{ activity.tag }}</td>
+                <td>{{ activity.stamp | date: 'MM/dd/YYYY' }}</td>
+                <td>{{ ('' + activity.dateTimeDimensionKey).slice(-2) }}</td>
+              </tr>
+              <tr *ngIf="activities.length === 0">
+                <td colspan="7" class="text-center">No data</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
